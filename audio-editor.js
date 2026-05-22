@@ -166,49 +166,91 @@ function createRow(song, index) {
   return tr;
 }
 
-// ─── Gestion de la clé API YouTube ───
-// REMPLACEZ LA VALEUR CI-DESSOUS PAR VOTRE CLÉ API YOUTUBE
-const YOUTUBE_API_KEY = "AIzaSyBTgbSPahw5Ck2pJDXx4KuDbB4H9kTP1IE";
+// ==========================================
+// ⚙️ CONFIGURATION (À remplir vous-même)
+// ==========================================
+
+// ── YouTube ──
+// Laissez vide pour utiliser Piped API en fallback
+const YOUTUBE_API_KEY = "";
+
+// ── GitHub (Pour sauvegarder directement) ──
+// Laissez vide pour utiliser le téléchargement classique
+const GITHUB_REPO = ""; // ex: "jean-baptiste/mon-repo"
+const GITHUB_TOKEN = ""; // ex: "ghp_xxxxxxxxxxxx"
+const GITHUB_FILE_PATH = "app/public/audio-map.js";
+
+const PIPED_INSTANCES = [
+  'https://pipedapi.kavin.rocks',
+  'https://pipedapi.tokhmi.xyz',
+  'https://piped-api.garudalinux.org',
+  'https://pipedapi.smarthome-zone.net',
+  'https://pipedapi.in.projectsegfau.lt'
+];
 
 // ─── Recherche API ───
 async function fetchYoutubeAPI(query, pageToken = '') {
-  if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "VOTRE_CLE_API_ICI") {
-    throw new Error("Veuillez renseigner votre clé API YouTube (const YOUTUBE_API_KEY) dans le fichier audio-editor.js");
+  let ytError = null;
+
+  // 1. Tenter l'API YouTube officielle si la clé est configurée
+  if (YOUTUBE_API_KEY && YOUTUBE_API_KEY !== "VOTRE_CLE_API_ICI") {
+    try {
+      let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
+      if (pageToken) url += `&pageToken=${pageToken}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        let errorMsg = `HTTP ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData.error && errData.error.message) {
+            errorMsg = errData.error.message;
+          }
+        } catch(e) {}
+        throw new Error(`Erreur API YouTube: ${errorMsg}`);
+      }
+      
+      const data = await response.json();
+      const items = data.items.map(item => {
+        const txt = document.createElement("textarea");
+        txt.innerHTML = item.snippet.title;
+        return {
+          url: `?v=${item.id.videoId}`,
+          thumbnail: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url,
+          title: txt.value,
+          uploaderName: item.snippet.channelTitle
+        };
+      });
+      
+      return { nextPageToken: data.nextPageToken, items: items };
+    } catch (err) {
+      console.warn("L'API YouTube officielle a échoué. Basculement sur Piped...", err);
+      ytError = err;
+    }
   }
 
-  let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
-  if (pageToken) url += `&pageToken=${pageToken}`;
-  
-  const response = await fetch(url);
-  
-  if (!response.ok) {
-    let errorMsg = `HTTP ${response.status}`;
+  // 2. Tenter les instances Piped en fallback (ou si pas de clé API)
+  let pipedError = null;
+  for (const instance of PIPED_INSTANCES) {
     try {
-      const errData = await response.json();
-      if (errData.error && errData.error.message) {
-        errorMsg = errData.error.message;
-      }
-    } catch(e) {}
-    throw new Error(`Erreur API YouTube: ${errorMsg}`);
+      let url = `${instance}/search?q=${encodeURIComponent(query)}&filter=videos`;
+      if (pageToken) url += `&nextpage=${encodeURIComponent(pageToken)}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      
+      return {
+        nextPageToken: data.nextpage || '',
+        items: data.items.slice(0, 8) // Prendre les 8 premiers
+      };
+    } catch (err) {
+      console.warn(`[API] Échec avec ${instance}:`, err);
+      pipedError = err;
+    }
   }
   
-  const data = await response.json();
-  const items = data.items.map(item => {
-    const txt = document.createElement("textarea");
-    txt.innerHTML = item.snippet.title;
-    
-    return {
-      url: `?v=${item.id.videoId}`,
-      thumbnail: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url,
-      title: txt.value,
-      uploaderName: item.snippet.channelTitle
-    };
-  });
-  
-  return {
-    nextPageToken: data.nextPageToken,
-    items: items
-  };
+  throw new Error("Toutes les méthodes de recherche (YouTube et Piped) ont échoué.");
 }
 
 function toggleSearch(tr, song, updateCallback) {
@@ -442,20 +484,21 @@ function renderTable() {
   updateStats();
 }
 
-function exportAudioMap() {
+// ─── Export & GitHub ───
+function generateContent() {
   const audioMap = {};
   allSongs.forEach(s => {
-    // N'exporter que si un youtubeId est défini (y compris 'NONE')
     if (s.youtubeId) {
       const pageKey = String(s.page);
       if (!audioMap[pageKey]) audioMap[pageKey] = [];
-      audioMap[pageKey].push({
-        title: s.title,
-        youtubeId: s.youtubeId
-      });
+      audioMap[pageKey].push({ title: s.title, youtubeId: s.youtubeId });
     }
   });
-  const content = `window.audio_map_data = ${JSON.stringify(audioMap, null, 2)};\n`;
+  return `window.audio_map_data = ${JSON.stringify(audioMap, null, 2)};\n`;
+}
+
+function exportAudioMap() {
+  const content = generateContent();
   const blob = new Blob([content], { type: 'text/javascript' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -466,6 +509,81 @@ function exportAudioMap() {
   
   modified = false;
   document.getElementById('save-indicator').classList.remove('visible');
+  document.getElementById('export-status').textContent = 'Fichier téléchargé ! Remplacez manuellement public/audio-map.js.';
+  document.getElementById('export-status').style.color = '#38bdf8';
+}
+
+async function pushToGithub() {
+  const repo = GITHUB_REPO;
+  const token = GITHUB_TOKEN;
+  const path = GITHUB_FILE_PATH;
+  const statusEl = document.getElementById('export-status');
+
+  if (!repo || !token || !path) {
+    statusEl.textContent = '❌ Configuration GitHub (const GITHUB_...) incomplète. Téléchargement local en cours...';
+    statusEl.style.color = '#f87171';
+    exportAudioMap();
+    return;
+  }
+
+  statusEl.textContent = '⏳ Récupération du fichier depuis GitHub...';
+  statusEl.style.color = '#fbbf24';
+
+  const content = generateContent();
+  
+  try {
+    // 1. Obtenir le SHA du fichier existant
+    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    let sha = null;
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha;
+    } else if (getRes.status !== 404) {
+      throw new Error(`Erreur lors de la lecture (${getRes.status})`);
+    }
+
+    // 2. Mettre à jour (ou créer) le fichier
+    statusEl.textContent = '⏳ Envoi des modifications vers GitHub...';
+    
+    // Encodage base64 utf-8 supportant les accents
+    const base64Content = btoa(unescape(encodeURIComponent(content)));
+
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Mise à jour des chants audio (via éditeur web)',
+        content: base64Content,
+        sha: sha // optionnel si 404 (nouveau fichier)
+      })
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json();
+      throw new Error(err.message || putRes.status);
+    }
+
+    statusEl.textContent = '✅ Fichier mis à jour avec succès sur GitHub !';
+    statusEl.style.color = '#4ade80';
+    modified = false;
+    document.getElementById('save-indicator').classList.remove('visible');
+
+  } catch (error) {
+    console.error("Erreur GitHub:", error);
+    statusEl.textContent = `❌ Échec de la mise à jour GitHub: ${error.message}. Téléchargement local en cours...`;
+    statusEl.style.color = '#f87171';
+    exportAudioMap();
+  }
 }
 
 document.getElementById('load-audio-map').addEventListener('click', async () => {
@@ -489,6 +607,9 @@ document.getElementById('load-audio-map').addEventListener('click', async () => 
 
 const exportBtn = document.getElementById('export-json');
 if(exportBtn) exportBtn.addEventListener('click', exportAudioMap);
+
+const exportGhBtn = document.getElementById('export-github');
+if(exportGhBtn) exportGhBtn.addEventListener('click', pushToGithub);
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
