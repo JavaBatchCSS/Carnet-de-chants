@@ -48,17 +48,6 @@
         <section class="export-section hidden-section" id="export-section">
             <div id="save-indicator" class="save-indicator">⚠️ Modifications non sauvegardées</div>
             
-            <div class="github-config" style="background: #1e293b; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
-                <h3 style="margin-top: 0; font-size: 1rem; color: #38bdf8;">🐙 Configuration GitHub (Optionnel)</h3>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
-                    <input type="text" id="gh-repo" placeholder="Propriétaire/Depot (ex: jean/repo)" class="search-box">
-                    <input type="password" id="gh-token" placeholder="Token d'accès personnel" class="search-box">
-                    <input type="text" id="gh-path" placeholder="Chemin (ex: public/audio-map.js)" value="public/audio-map.js" class="search-box" style="flex:1">
-                    <button id="save-gh-config" class="secondary-btn">Enregistrer</button>
-                </div>
-                <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Remplissez ceci pour envoyer directement les modifications sur GitHub. Laissé vide, l'export télécharge un fichier local.</p>
-            </div>
-
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <button id="export-github" class="primary-btn" style="background: linear-gradient(135deg, #10b981, #059669);">🚀 Pousser sur GitHub</button>
                 <button id="export-json" class="secondary-btn">💾 Télécharger (Secours)</button>
