@@ -167,26 +167,18 @@ function createRow(song, index) {
 }
 
 // ─── Gestion de la clé API YouTube ───
-const apiKeyInput = document.getElementById('yt-api-key');
-if (apiKeyInput) {
-  apiKeyInput.value = localStorage.getItem('yt_api_key') || '';
-}
-const saveKeyBtn = document.getElementById('save-api-key');
-if (saveKeyBtn) {
-  saveKeyBtn.addEventListener('click', () => {
-    localStorage.setItem('yt_api_key', apiKeyInput.value.trim());
-    alert('Clé API enregistrée localement !');
-  });
-}
+// REMPLACEZ LA VALEUR CI-DESSOUS PAR VOTRE CLÉ API YOUTUBE
+const YOUTUBE_API_KEY = "AIzaSyBTgbSPahw5Ck2pJDXx4KuDbB4H9kTP1IE";
 
 // ─── Recherche API ───
-async function fetchYoutubeAPI(query) {
-  const key = localStorage.getItem('yt_api_key');
-  if (!key) {
-    throw new Error("Veuillez entrer une clé API YouTube en haut de la page.");
+async function fetchYoutubeAPI(query, pageToken = '') {
+  if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "VOTRE_CLE_API_ICI") {
+    throw new Error("Veuillez renseigner votre clé API YouTube (const YOUTUBE_API_KEY) dans le fichier audio-editor.js");
   }
 
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${key}`;
+  let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
+  if (pageToken) url += `&pageToken=${pageToken}`;
+  
   const response = await fetch(url);
   
   if (!response.ok) {
@@ -201,8 +193,7 @@ async function fetchYoutubeAPI(query) {
   }
   
   const data = await response.json();
-  return data.items.map(item => {
-    // On décode les entités HTML dans les titres renvoyés par YouTube
+  const items = data.items.map(item => {
     const txt = document.createElement("textarea");
     txt.innerHTML = item.snippet.title;
     
@@ -210,10 +201,14 @@ async function fetchYoutubeAPI(query) {
       url: `?v=${item.id.videoId}`,
       thumbnail: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url,
       title: txt.value,
-      uploaderName: item.snippet.channelTitle,
-      duration: 0 // L'API search ne renvoie pas la durée sans appel supplémentaire
+      uploaderName: item.snippet.channelTitle
     };
   });
+  
+  return {
+    nextPageToken: data.nextPageToken,
+    items: items
+  };
 }
 
 function toggleSearch(tr, song, updateCallback) {
@@ -232,13 +227,24 @@ function toggleSearch(tr, song, updateCallback) {
   const searchBar = document.createElement('div');
   searchBar.className = 'search-bar';
 
+  const channelSelect = document.createElement('select');
+  channelSelect.className = 'search-input';
+  channelSelect.style.flex = '0 0 160px';
+  channelSelect.innerHTML = `
+    <option value="Choeur Montjoie OR Sapiens OR Padres">Top 3 chaînes</option>
+    <option value="Choeur Montjoie Saint Denis">Chœur Montjoie</option>
+    <option value="Sapiens France">Sapiens France</option>
+    <option value="Les Padres">Les Padrés</option>
+    <option value="">N'importe qui</option>
+  `;
+
   const searchInput = document.createElement('input');
   searchInput.type = 'text';
-  searchInput.value = `${song.title} Choeur Montjoie OR Sapiens OR Padres`;
+  searchInput.value = song.title; // On ne met plus les OR ici, c'est géré par le select
   searchInput.className = 'search-input';
 
   const goBtn = document.createElement('button');
-  goBtn.textContent = '🔍 Chercher via API';
+  goBtn.textContent = '🔍 Chercher';
   goBtn.className = 'primary-btn';
   goBtn.style.padding = '.4rem .8rem';
 
@@ -248,27 +254,54 @@ function toggleSearch(tr, song, updateCallback) {
   closeBtn.style.padding = '.4rem .6rem';
   closeBtn.addEventListener('click', () => searchTr.remove());
 
+  searchBar.appendChild(channelSelect);
   searchBar.appendChild(searchInput);
   searchBar.appendChild(goBtn);
   searchBar.appendChild(closeBtn);
 
+  const previewContainer = document.createElement('div');
+  previewContainer.className = 'search-preview-container';
+
   const resultsDiv = document.createElement('div');
   resultsDiv.className = 'yt-results-grid';
 
-  async function doSearch() {
-    const query = searchInput.value.trim();
-    if (!query) return;
-    resultsDiv.innerHTML = '<p class="loading-text">Recherche en cours...</p>';
+  const loadMoreBtn = document.createElement('button');
+  loadMoreBtn.textContent = 'Charger plus de résultats...';
+  loadMoreBtn.className = 'secondary-btn';
+  loadMoreBtn.style.display = 'none';
+  loadMoreBtn.style.width = '100%';
+  loadMoreBtn.style.marginTop = '1rem';
+
+  let currentNextPageToken = '';
+
+  async function doSearch(isLoadMore = false) {
+    const baseQuery = searchInput.value.trim();
+    if (!baseQuery) return;
+
+    const channelFilter = channelSelect.value;
+    const query = channelFilter ? `${baseQuery} ${channelFilter}` : baseQuery;
+    
+    if (!isLoadMore) {
+      resultsDiv.innerHTML = '<p class="loading-text">Recherche en cours...</p>';
+      currentNextPageToken = '';
+      loadMoreBtn.style.display = 'none';
+      previewContainer.innerHTML = '';
+    } else {
+      loadMoreBtn.textContent = 'Chargement...';
+      loadMoreBtn.disabled = true;
+    }
 
     try {
-      const results = await fetchYoutubeAPI(query);
-      resultsDiv.innerHTML = '';
-      if (results.length === 0) {
+      const results = await fetchYoutubeAPI(query, currentNextPageToken);
+      
+      if (!isLoadMore) resultsDiv.innerHTML = '';
+      
+      if (results.items.length === 0 && !isLoadMore) {
         resultsDiv.innerHTML = '<p class="loading-text">Aucun résultat trouvé.</p>';
         return;
       }
       
-      results.forEach(item => {
+      results.items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'yt-card';
         const vidId = item.url.split('?v=')[1];
@@ -278,31 +311,69 @@ function toggleSearch(tr, song, updateCallback) {
           <div class="yt-card-info">
             <div class="yt-card-title" title="${item.title}">${item.title}</div>
             <div class="yt-card-author">${item.uploaderName}</div>
+            <div class="yt-card-actions" style="margin-top:0.5rem; display:flex; gap:0.4rem;">
+              <button class="primary-btn select-video-btn" style="flex:1; padding:0.4rem; font-size:0.8rem;">Sélectionner</button>
+              <button class="secondary-btn preview-video-btn" style="padding:0.4rem; font-size:0.8rem;" title="Préécouter">▶</button>
+            </div>
           </div>
         `;
         
-        card.addEventListener('click', () => {
+        card.querySelector('.select-video-btn').addEventListener('click', () => {
           song.youtubeId = vidId;
           updateCallback();
           searchTr.remove(); // fermer la recherche après sélection
         });
+
+        card.querySelector('.preview-video-btn').addEventListener('click', () => {
+          previewContainer.innerHTML = `
+            <div style="position:relative; width:100%; height:250px; margin-bottom:1rem;">
+              <iframe width="100%" height="100%" style="border:none; border-radius:8px;" 
+                src="https://www.youtube.com/embed/${vidId}?autoplay=1" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+              </iframe>
+              <button class="danger-btn close-preview-btn" style="position:absolute; top:5px; right:5px;">✖ Fermer l'aperçu</button>
+            </div>
+          `;
+          previewContainer.querySelector('.close-preview-btn').addEventListener('click', () => {
+            previewContainer.innerHTML = '';
+          });
+          previewContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
         
         resultsDiv.appendChild(card);
       });
+
+      currentNextPageToken = results.nextPageToken;
+      if (currentNextPageToken) {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.textContent = 'Charger plus de résultats...';
+        loadMoreBtn.disabled = false;
+      } else {
+        loadMoreBtn.style.display = 'none';
+      }
+
     } catch (err) {
-      resultsDiv.innerHTML = `<p class="loading-text" style="color:#f87171">Erreur de recherche: ${err.message}. L'API est peut-être temporairement indisponible.</p>`;
+      if (!isLoadMore) {
+        resultsDiv.innerHTML = `<p class="loading-text" style="color:#f87171">Erreur de recherche: ${err.message}</p>`;
+      } else {
+        loadMoreBtn.textContent = 'Erreur. Réessayer ?';
+        loadMoreBtn.disabled = false;
+      }
     }
   }
 
-  goBtn.addEventListener('click', doSearch);
-  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+  loadMoreBtn.addEventListener('click', () => doSearch(true));
+  goBtn.addEventListener('click', () => doSearch(false));
+  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(false); });
 
   searchTd.appendChild(searchBar);
+  searchTd.appendChild(previewContainer);
   searchTd.appendChild(resultsDiv);
+  searchTd.appendChild(loadMoreBtn);
   searchTr.appendChild(searchTd);
   tr.after(searchTr);
 
-  doSearch();
+  doSearch(false);
 }
 
 function togglePreview(tr, song) {
