@@ -177,6 +177,10 @@ function createRow(song, index, songsOnPage) {
 // ==========================================
 
 function getConfig(key, fallback = '') {
+  // Clé API fournie par l'utilisateur comme valeur par défaut
+  if (key === 'yt_key' && !localStorage.getItem('chants_cfg_yt_key')) {
+    return 'AIzaSyBTgbSPahw5Ck2pJDXx4KuDbB4H9kTP1IE';
+  }
   return localStorage.getItem('chants_cfg_' + key) || fallback;
 }
 
