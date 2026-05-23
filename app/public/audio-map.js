@@ -848,7 +848,7 @@ window.audio_map_data = {
   "185": [
     {
       "title": "Chant du 2ème REP",
-      "youtubeId": "i-GB7YSJGOM"
+      "youtubeId": "v_j5rYlrfTg"
     }
   ],
   "186": [
@@ -861,12 +861,6 @@ window.audio_map_data = {
     {
       "title": "Sous le soleil brûlant d'Afrique",
       "youtubeId": "1YsMK4m83GQ"
-    }
-  ],
-  "188": [
-    {
-      "title": "Sidi-Brahim",
-      "youtubeId": "b6qfXz0z9_w"
     }
   ],
   "189": [
@@ -920,7 +914,7 @@ window.audio_map_data = {
   "197": [
     {
       "title": "L'enfant de Strasbourg",
-      "youtubeId": "4meGLb8wV9g"
+      "youtubeId": "lbIQnmvbh9s"
     }
   ],
   "198": [
@@ -932,7 +926,7 @@ window.audio_map_data = {
   "199": [
     {
       "title": "Le clairon",
-      "youtubeId": "O7k2qzIR-3s"
+      "youtubeId": "pu6G6PxUyeA"
     }
   ],
   "200": [
@@ -1041,12 +1035,6 @@ window.audio_map_data = {
       "youtubeId": "nAtJ89uZ500"
     }
   ],
-  "227": [
-    {
-      "title": "Le jour au loin s'enfuit",
-      "youtubeId": "Km7hyRF_aOQ"
-    }
-  ],
   "228": [
     {
       "title": "Hymne à la joie",
@@ -1061,12 +1049,6 @@ window.audio_map_data = {
     {
       "title": "Canon de la pluie",
       "youtubeId": "hVXtim3hhho"
-    }
-  ],
-  "231": [
-    {
-      "title": "Table des matières",
-      "youtubeId": "NONE"
     }
   ]
 };
