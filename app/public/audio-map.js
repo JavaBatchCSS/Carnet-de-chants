@@ -441,6 +441,12 @@ window.audio_map_data = {
       "youtubeId": "leuwMdMMTGQ"
     }
   ],
+  "106": [
+    {
+      "title": "Chant du Bas-Poitou",
+      "youtubeId": "6GqDuO0kcQw"
+    }
+  ],
   "107": [
     {
       "title": "La blanche hermine",
