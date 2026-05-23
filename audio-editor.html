@@ -14,6 +14,41 @@
         <nav><a href="index.html">← Retour à l'application</a></nav>
     </header>
     <main>
+        <!-- Section configuration des clés -->
+        <section class="config-section">
+            <details id="config-panel">
+                <summary>🔑 Configuration des clés API</summary>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="cfg-yt-key">🎬 Clé API YouTube <span class="optional">(optionnel — fallback Piped si vide)</span></label>
+                        <div class="config-input-row">
+                            <input type="password" id="cfg-yt-key" placeholder="AIzaSy..." class="config-input">
+                            <button class="toggle-vis-btn" data-target="cfg-yt-key" title="Afficher/Masquer">👁</button>
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-gh-repo">🐙 Dépôt GitHub <span class="optional">(optionnel — fallback téléchargement si vide)</span></label>
+                        <input type="text" id="cfg-gh-repo" placeholder="proprietaire/depot" class="config-input">
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-gh-token">🔐 Token GitHub</label>
+                        <div class="config-input-row">
+                            <input type="password" id="cfg-gh-token" placeholder="ghp_xxxxxxxxxxxx" class="config-input">
+                            <button class="toggle-vis-btn" data-target="cfg-gh-token" title="Afficher/Masquer">👁</button>
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-gh-path">📁 Chemin du fichier dans le dépôt</label>
+                        <input type="text" id="cfg-gh-path" value="app/public/audio-map.js" class="config-input">
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: .5rem; align-items: center;">
+                    <button id="save-config" class="primary-btn" style="padding: .5rem 1.2rem;">💾 Sauvegarder la configuration</button>
+                    <span id="config-status" style="font-size: .85rem;"></span>
+                </div>
+            </details>
+        </section>
+
         <section class="load-section">
             <button id="load-audio-map" class="primary-btn">📂 Charger la liste des chants</button>
             <p id="load-status" class="load-status"></p>

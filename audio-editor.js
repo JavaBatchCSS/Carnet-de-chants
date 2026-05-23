@@ -86,15 +86,21 @@ function getStatusInfo(youtubeId) {
   return { class: 'found', html: '<span class="badge badge-ok">✅</span>' };
 }
 
-function createRow(song, index) {
+function createRow(song, index, songsOnPage) {
   const tr = document.createElement('tr');
   const statusInfo = getStatusInfo(song.youtubeId);
   tr.className = statusInfo.class;
   tr.dataset.index = index;
 
   const tdPage = document.createElement('td');
-  tdPage.textContent = song.page;
   tdPage.className = 'col-page';
+  tdPage.textContent = song.page;
+  if (songsOnPage > 1) {
+    const indicator = document.createElement('span');
+    indicator.className = 'page-indicator';
+    indicator.textContent = `${songsOnPage} chants`;
+    tdPage.appendChild(indicator);
+  }
 
   const tdTitle = document.createElement('td');
   tdTitle.className = 'col-title';
@@ -167,18 +173,56 @@ function createRow(song, index) {
 }
 
 // ==========================================
-// ⚙️ CONFIGURATION (À remplir vous-même)
+// ⚙️ CONFIGURATION (stockée dans localStorage)
 // ==========================================
 
-// ── YouTube ──
-// Laissez vide pour utiliser Piped API en fallback
-const YOUTUBE_API_KEY = "";
+function getConfig(key, fallback = '') {
+  return localStorage.getItem('chants_cfg_' + key) || fallback;
+}
 
-// ── GitHub (Pour sauvegarder directement) ──
-// Laissez vide pour utiliser le téléchargement classique
-const GITHUB_REPO = ""; // ex: "jean-baptiste/mon-repo"
-const GITHUB_TOKEN = ""; // ex: "ghp_xxxxxxxxxxxx"
-const GITHUB_FILE_PATH = "app/public/audio-map.js";
+// ── Initialisation de l'interface de configuration ──
+(function initConfig() {
+  const fields = {
+    'cfg-yt-key':  'yt_key',
+    'cfg-gh-repo': 'gh_repo',
+    'cfg-gh-token':'gh_token',
+    'cfg-gh-path': 'gh_path'
+  };
+
+  // Remplir les champs avec les valeurs stockées
+  Object.entries(fields).forEach(([elId, storageKey]) => {
+    const el = document.getElementById(elId);
+    if (el) {
+      const stored = getConfig(storageKey);
+      if (stored) el.value = stored;
+    }
+  });
+
+  // Bouton Sauvegarder
+  document.getElementById('save-config')?.addEventListener('click', () => {
+    Object.entries(fields).forEach(([elId, storageKey]) => {
+      const el = document.getElementById(elId);
+      if (el) localStorage.setItem('chants_cfg_' + storageKey, el.value.trim());
+    });
+    const st = document.getElementById('config-status');
+    if (st) { st.textContent = '✅ Configuration sauvegardée !'; st.style.color = '#4ade80'; }
+    setTimeout(() => { if (st) st.textContent = ''; }, 3000);
+  });
+
+  // Boutons afficher/masquer mot de passe
+  document.querySelectorAll('.toggle-vis-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (target) target.type = target.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  // Ouvrir automatiquement le panneau s'il manque la clé YouTube
+  if (!getConfig('yt_key')) {
+    const panel = document.getElementById('config-panel');
+    if (panel) panel.open = true;
+  }
+})();
 
 const PIPED_INSTANCES = [
   'https://pipedapi.kavin.rocks',
@@ -191,11 +235,12 @@ const PIPED_INSTANCES = [
 // ─── Recherche API ───
 async function fetchYoutubeAPI(query, pageToken = '') {
   let ytError = null;
+  const ytKey = getConfig('yt_key');
 
   // 1. Tenter l'API YouTube officielle si la clé est configurée
-  if (YOUTUBE_API_KEY && YOUTUBE_API_KEY !== "VOTRE_CLE_API_ICI") {
+  if (ytKey) {
     try {
-      let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
+      let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${ytKey}`;
       if (pageToken) url += `&pageToken=${pageToken}`;
       
       const response = await fetch(url);
@@ -459,7 +504,14 @@ function renderTable() {
 
   const searchTerm = (document.getElementById('search-box')?.value || '').toLowerCase();
 
+  // Pré-calculer combien de chants par page
+  const songsPerPage = {};
+  allSongs.forEach(s => {
+    songsPerPage[s.page] = (songsPerPage[s.page] || 0) + 1;
+  });
+
   let currentSection = null;
+  let lastPage = null;
 
   allSongs.forEach((song, idx) => {
     const info = getStatusInfo(song.youtubeId);
@@ -469,16 +521,24 @@ function renderTable() {
     if (searchTerm && !song.title.toLowerCase().includes(searchTerm) &&
         !String(song.page).includes(searchTerm)) return;
 
-    // En-tête de section
+    // En-tête de section (grande partie)
     if (song.sectionName !== currentSection) {
       currentSection = song.sectionName;
       const secTr = document.createElement('tr');
       secTr.className = 'section-header';
       secTr.innerHTML = `<td colspan="4">${currentSection}</td>`;
       tbody.appendChild(secTr);
+      lastPage = null; // reset pour le séparateur de page
     }
 
-    tbody.appendChild(createRow(song, idx));
+    // Séparateur de page (trait visuel entre groupes de pages)
+    const row = createRow(song, idx, songsPerPage[song.page]);
+    if (song.page !== lastPage) {
+      row.classList.add('page-group-start');
+      lastPage = song.page;
+    }
+
+    tbody.appendChild(row);
   });
 
   updateStats();
@@ -514,13 +574,13 @@ function exportAudioMap() {
 }
 
 async function pushToGithub() {
-  const repo = GITHUB_REPO;
-  const token = GITHUB_TOKEN;
-  const path = GITHUB_FILE_PATH;
+  const repo = getConfig('gh_repo');
+  const token = getConfig('gh_token');
+  const path = getConfig('gh_path', 'app/public/audio-map.js');
   const statusEl = document.getElementById('export-status');
 
   if (!repo || !token || !path) {
-    statusEl.textContent = '❌ Configuration GitHub (const GITHUB_...) incomplète. Téléchargement local en cours...';
+    statusEl.textContent = '❌ Configuration GitHub incomplète (remplir la section 🔑 en haut). Téléchargement local…';
     statusEl.style.color = '#f87171';
     exportAudioMap();
     return;
