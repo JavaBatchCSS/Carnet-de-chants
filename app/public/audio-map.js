@@ -44,7 +44,7 @@ window.audio_map_data = {
   "10": [
     {
       "title": "Chant de la promesse",
-      "youtubeId": "NHivGUlvHmc"
+      "youtubeId": "fgGdUYGDAvc"
     }
   ],
   "11": [
@@ -1041,6 +1041,12 @@ window.audio_map_data = {
       "youtubeId": "nAtJ89uZ500"
     }
   ],
+  "227": [
+    {
+      "title": "Le jour au loin s'enfuit",
+      "youtubeId": "Km7hyRF_aOQ"
+    }
+  ],
   "228": [
     {
       "title": "Hymne à la joie",
@@ -1055,6 +1061,12 @@ window.audio_map_data = {
     {
       "title": "Canon de la pluie",
       "youtubeId": "hVXtim3hhho"
+    }
+  ],
+  "231": [
+    {
+      "title": "Table des matières",
+      "youtubeId": "NONE"
     }
   ]
 };
