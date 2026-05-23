@@ -404,7 +404,8 @@ function toggleSearch(tr, song, updateCallback) {
             <div class="yt-card-author">${item.uploaderName}</div>
             <div class="yt-card-actions" style="margin-top:0.5rem; display:flex; gap:0.4rem;">
               <button class="primary-btn select-video-btn" style="flex:1; padding:0.4rem; font-size:0.8rem;">Sélectionner</button>
-              <button class="secondary-btn preview-video-btn" style="padding:0.4rem; font-size:0.8rem;" title="Préécouter">▶</button>
+              <button class="secondary-btn preview-video-btn" style="padding:0.4rem; font-size:0.8rem;" title="Préécouter ici">▶</button>
+              <a href="https://www.youtube.com/watch?v=${vidId}" target="_blank" class="secondary-btn" style="padding:0.4rem; font-size:0.8rem; text-decoration:none; display:flex; align-items:center;" title="Ouvrir sur YouTube (Secours)">↗</a>
             </div>
           </div>
         `;
@@ -417,12 +418,15 @@ function toggleSearch(tr, song, updateCallback) {
 
         card.querySelector('.preview-video-btn').addEventListener('click', () => {
           previewContainer.innerHTML = `
-            <div style="position:relative; width:100%; height:250px; margin-bottom:1rem;">
+            <div style="position:relative; width:100%; height:250px; margin-bottom:1rem; background:#000; border-radius:8px;">
               <iframe width="100%" height="100%" style="border:none; border-radius:8px;" 
-                src="https://www.youtube.com/embed/${vidId}?autoplay=1" 
+                src="https://yewtu.be/embed/${vidId}?autoplay=1" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
               </iframe>
-              <button class="danger-btn close-preview-btn" style="position:absolute; top:5px; right:5px;">✖ Fermer l'aperçu</button>
+              <div style="position:absolute; top:5px; right:5px; display:flex; gap:5px;">
+                <a href="https://www.youtube.com/watch?v=${vidId}" target="_blank" class="secondary-btn" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.6rem;">↗ Ouvrir sur YouTube</a>
+                <button class="danger-btn close-preview-btn">✖ Fermer</button>
+              </div>
             </div>
           `;
           previewContainer.querySelector('.close-preview-btn').addEventListener('click', () => {
@@ -480,24 +484,46 @@ function togglePreview(tr, song) {
   prevTr.className = 'preview-row';
   const td = document.createElement('td');
   td.colSpan = 4;
+  td.style.position = 'relative';
 
   const iframe = document.createElement('iframe');
   iframe.width = '100%';
   iframe.height = '220';
   iframe.style.border = 'none';
   iframe.style.borderRadius = '8px';
+  iframe.style.background = '#000';
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
-  iframe.src = `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1`;
+  iframe.src = `https://yewtu.be/embed/${song.youtubeId}?autoplay=1`;
+
+  const btnContainer = document.createElement('div');
+  btnContainer.style.position = 'absolute';
+  btnContainer.style.top = '15px';
+  btnContainer.style.right = '20px';
+  btnContainer.style.display = 'flex';
+  btnContainer.style.gap = '5px';
+
+  const openBtn = document.createElement('a');
+  openBtn.href = `https://www.youtube.com/watch?v=${song.youtubeId}`;
+  openBtn.target = '_blank';
+  openBtn.textContent = '↗ Ouvrir sur YouTube';
+  openBtn.className = 'secondary-btn';
+  openBtn.style.textDecoration = 'none';
+  openBtn.style.fontSize = '0.8rem';
+  openBtn.style.padding = '0.3rem 0.6rem';
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✖ Fermer';
   closeBtn.className = 'danger-btn';
-  closeBtn.style.marginTop = '6px';
+  closeBtn.style.fontSize = '0.8rem';
+  closeBtn.style.padding = '0.3rem 0.6rem';
   closeBtn.addEventListener('click', () => prevTr.remove());
 
+  btnContainer.appendChild(openBtn);
+  btnContainer.appendChild(closeBtn);
+
   td.appendChild(iframe);
-  td.appendChild(closeBtn);
+  td.appendChild(btnContainer);
   prevTr.appendChild(td);
   tr.after(prevTr);
 }
