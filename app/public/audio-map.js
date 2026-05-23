@@ -110,7 +110,7 @@ window.audio_map_data = {
   "23": [
     {
       "title": "Prière du Parachutiste",
-      "youtubeId": "25jaQz9NHEs"
+      "youtubeId": "VoSv5MtNHfw"
     }
   ],
   "26": [
@@ -453,6 +453,12 @@ window.audio_map_data = {
       "youtubeId": "HUphoDbaPgQ"
     }
   ],
+  "109": [
+    {
+      "title": "Chanson de l'armée de Charette",
+      "youtubeId": "JPJReD7B5g4"
+    }
+  ],
   "110": [
     {
       "title": "Jean Cottereau",
@@ -599,6 +605,12 @@ window.audio_map_data = {
       "youtubeId": "oevTvrit-N0"
     }
   ],
+  "136": [
+    {
+      "title": "Saints de France",
+      "youtubeId": "xxEX6B-4Cd8"
+    }
+  ],
   "137": [
     {
       "title": "Russie libre",
@@ -621,6 +633,12 @@ window.audio_map_data = {
     {
       "title": "Honneur et Fidélité",
       "youtubeId": "iTucDo8sJiE"
+    }
+  ],
+  "141": [
+    {
+      "title": "Le Roy Renaud",
+      "youtubeId": "GLus6tXUOTI"
     }
   ],
   "142": [
@@ -699,6 +717,18 @@ window.audio_map_data = {
     {
       "title": "La légende de Saint Nicolas",
       "youtubeId": "M9steij7LEM"
+    }
+  ],
+  "155": [
+    {
+      "title": "La légende de Saint Nicolas (suite)",
+      "youtubeId": "U_IEBtOEAQU"
+    }
+  ],
+  "156": [
+    {
+      "title": "Cadet Rousselle",
+      "youtubeId": "1obMzIJ77BA"
     }
   ],
   "157": [
@@ -995,6 +1025,24 @@ window.audio_map_data = {
       "youtubeId": "Ipc0VCYhQqA"
     }
   ],
+  "212": [
+    {
+      "title": "L'homme de Cro-Magnon",
+      "youtubeId": "wTaWiu9XDbg"
+    }
+  ],
+  "214": [
+    {
+      "title": "Se canto (Devant ma fenêtre)",
+      "youtubeId": "f26jp_WZGjA"
+    }
+  ],
+  "216": [
+    {
+      "title": "Les crocodiles",
+      "youtubeId": "1T9b0cax6s4"
+    }
+  ],
   "217": [
     {
       "title": "Cantique des étoiles",
@@ -1027,6 +1075,12 @@ window.audio_map_data = {
     {
       "title": "La montagne",
       "youtubeId": "_pJya8MdVMk"
+    }
+  ],
+  "223": [
+    {
+      "title": "La jument de Michao",
+      "youtubeId": "aes401GQTEk"
     }
   ],
   "224": [
