@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet de Chants</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Barre de recherche fixe -->
+    <header class="search-bar">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Rechercher un chant ou une page...">
+            <button id="search-btn">🔍</button>
+        </div>
+        <!-- Search Results (hidden by default) -->
+        <div id="search-results" class="search-results hidden"></div>
+    </header>
+
+    <!-- Modal pour afficher la vidéo YouTube -->
+    <div id="youtube-modal" class="youtube-modal hidden">
+        <div class="modal-content">
+            <span id="close-modal" class="close-modal">&times;</span>
+            <div id="modal-title" class="modal-title">Titre du chant</div>
+            <div id="youtube-iframe-container" class="youtube-iframe-container"></div>
+        </div>
+    </div>
+
+    <!-- Conteneur principal (scroll-snapping) -->
+    <main id="book-container" class="book-container">
+        <!-- Le sommaire et les pages seront injectés ici par app.js -->
+    </main>
+
+    <!-- Panneau de contrôle flottant -->
+    <div id="floating-controls" class="floating-controls hidden-control">
+        <div class="controls-current-song">
+            <span class="music-icon">🎵</span>
+            <span id="current-song-title">Sélectionnez un chant</span>
+        </div>
+        <div class="controls-buttons">
+            <button id="floating-play-btn" class="control-btn-play" title="Écouter le chant actuel">
+                <span>▶</span> Écouter
+            </button>
+            <div class="column-selector">
+                <span class="selector-label">Colonnes :</span>
+                <button class="col-btn active" data-cols="default">Auto</button>
+                <button class="col-btn" data-cols="1">1</button>
+                <button class="col-btn" data-cols="2">2</button>
+                <button class="col-btn" data-cols="3">3</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script src="public/songs-index.js"></script>
+    <script src="public/pages-index.js"></script>
+    <script src="public/page-content.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>

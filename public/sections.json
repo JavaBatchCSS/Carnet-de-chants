@@ -1,0 +1,51 @@
+{
+  "prieres": {
+    "name": "Prières et Cantiques",
+    "start": 1,
+    "end": 24,
+    "icon": "✝",
+    "id": "prieres"
+  },
+  "chants-scouts": {
+    "name": "Chants Scouts",
+    "start": 26,
+    "end": 67,
+    "icon": "⚜",
+    "id": "chants-scouts"
+  },
+  "chants-marins": {
+    "name": "Chants Marins",
+    "start": 68,
+    "end": 95,
+    "icon": "⚓",
+    "id": "chants-marins"
+  },
+  "fleur-de-lys": {
+    "name": "Chants de la Fleur de Lys",
+    "start": 98,
+    "end": 112,
+    "icon": "⚜",
+    "id": "fleur-de-lys"
+  },
+  "tradition": {
+    "name": "Chants de Tradition",
+    "start": 114,
+    "end": 160,
+    "icon": "♔",
+    "id": "tradition"
+  },
+  "guerre": {
+    "name": "Chants de Guerre",
+    "start": 163,
+    "end": 199,
+    "icon": "⚔",
+    "id": "guerre"
+  },
+  "soir": {
+    "name": "Chants de Veillée",
+    "start": 203,
+    "end": 230,
+    "icon": "☽",
+    "id": "soir"
+  }
+}
