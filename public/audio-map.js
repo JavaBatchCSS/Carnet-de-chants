@@ -363,43 +363,43 @@ window.audio_map_data = {
       "youtubeId": "cxvZLaPf8Fw"
     }
   ],
-  "84": [
+  "85": [
     {
       "title": "Quand je suis parti de La Rochelle",
       "youtubeId": "_GgfppQZ4U4"
     }
   ],
-  "85": [
+  "86": [
     {
       "title": "Belle Virginie",
       "youtubeId": "Kg1xySZgGSw"
     }
   ],
-  "88": [
+  "89": [
     {
       "title": "Qui peut faire de la voile sans vent",
       "youtubeId": "IpBnNK_eVmg"
     }
   ],
-  "91": [
+  "92": [
     {
       "title": "Brave marin",
       "youtubeId": "V065-EBGzNs"
     }
   ],
-  "92": [
+  "93": [
     {
       "title": "Chantons pour passer le temps",
       "youtubeId": "_HK2g8dNFSY"
     }
   ],
-  "93": [
+  "94": [
     {
       "title": "Guerre guerre, vente vent !",
       "youtubeId": "PJxHWQy1bk4"
     }
   ],
-  "94": [
+  "95": [
     {
       "title": "Chant des Corsaires",
       "youtubeId": "4a4T14L3GTY"
@@ -493,7 +493,9 @@ window.audio_map_data = {
     {
       "title": "Occident, en avant !",
       "youtubeId": "uuGlE1Sl1PQ"
-    },
+    }
+  ],
+  "118": [
     {
       "title": "Au revoir camarade",
       "youtubeId": "UjBBWtvqpAw"
@@ -503,223 +505,221 @@ window.audio_map_data = {
       "youtubeId": "wNvVM9xj4fY"
     }
   ],
-  "118": [
+  "119": [
     {
       "title": "Pelot d'Hennebont",
       "youtubeId": "tq4Dio1yjtU"
     }
   ],
-  "119": [
+  "120": [
     {
       "title": "Malbrough s'en va-t-en guerre",
       "youtubeId": "4-zmHDjJrWg"
     }
   ],
-  "120": [
+  "121": [
     {
       "title": "Frédéri",
       "youtubeId": "dWRYGjdY5q4"
     }
   ],
-  "121": [
+  "122": [
     {
       "title": "Le vieux Joe",
       "youtubeId": "U7cspGkh9k4"
     }
   ],
-  "122": [
+  "123": [
     {
       "title": "Le vieux chalet",
       "youtubeId": "K1BKIf4rEGM"
     }
   ],
-  "123": [
+  "124": [
     {
       "title": "La bataille de Fontenoy",
       "youtubeId": "q1Gu5CRV4bI"
     }
   ],
-  "124": [
+  "125": [
     {
       "title": "Fleur d'épine",
       "youtubeId": "6VbrY2HhFNM"
     }
   ],
-  "125": [
+  "126": [
     {
       "title": "La complainte de Mandrin",
       "youtubeId": "ZFuDCq-fWsI"
     }
   ],
-  "126": [
+  "127": [
     {
       "title": "La Piémontaise",
       "youtubeId": "COVxJ_9Qszc"
     }
   ],
-  "127": [
+  "128": [
     {
       "title": "File la laine",
       "youtubeId": "soCF-0KThsY"
     }
   ],
-  "128": [
+  "129": [
     {
       "title": "Debout les gars",
       "youtubeId": "KVdxpOqa-Yg"
     }
   ],
-  "129": [
+  "130": [
     {
       "title": "Le Roi Arthur",
       "youtubeId": "dkiBwTQnAu4"
     }
   ],
-  "130": [
+  "131": [
     {
       "title": "Le soldat belge",
       "youtubeId": "ngv0qAcfpds"
     }
   ],
-  "132": [
+  "133": [
     {
       "title": "Les gars de Locminé",
       "youtubeId": "vqfixn08FjM"
     }
   ],
-  "133": [
+  "134": [
     {
       "title": "La trompe sonne",
       "youtubeId": "TJN43hH902E"
     }
   ],
-  "134": [
+  "135": [
     {
       "title": "Berceuse du petit Prince",
       "youtubeId": "M4xMg_LI3HM"
     }
   ],
-  "135": [
+  "136": [
     {
       "title": "Le Roy Louis",
       "youtubeId": "oevTvrit-N0"
     }
   ],
-  "136": [
+  "137": [
     {
       "title": "Saints de France",
       "youtubeId": "xxEX6B-4Cd8"
     }
   ],
-  "137": [
+  "138": [
     {
       "title": "Russie libre",
       "youtubeId": "xuty0pFEkzA"
     }
   ],
-  "138": [
+  "139": [
     {
       "title": "Le Seigneur appelle ses militants",
       "youtubeId": "6f1QsaN_aJU"
     }
   ],
-  "139": [
+  "140": [
     {
       "title": "Le cygne de Montfort",
       "youtubeId": "XGcd3FJzREc"
     }
   ],
-  "140": [
+  "141": [
     {
       "title": "Honneur et Fidélité",
       "youtubeId": "iTucDo8sJiE"
     }
   ],
-  "141": [
+  "142": [
     {
       "title": "Le Roy Renaud",
       "youtubeId": "GLus6tXUOTI"
     }
   ],
-  "142": [
+  "143": [
     {
       "title": "La violette",
       "youtubeId": "S9wcQI2Irfo"
     }
   ],
-  "143": [
+  "144": [
     {
       "title": "Les Terres Saintes",
       "youtubeId": "FTveHIDZmMM"
     }
   ],
-  "144": [
+  "145": [
     {
       "title": "Vive Henri IV",
       "youtubeId": "WVys3aoU4SY"
     }
   ],
-  "145": [
+  "146": [
     {
       "title": "Marche des vagabonds",
       "youtubeId": "GhUg1RRWjrc"
     }
   ],
-  "146": [
+  "147": [
     {
       "title": "Silvestrick",
       "youtubeId": "fUjqxEkOHwg"
     }
   ],
-  "147": [
+  "148": [
     {
       "title": "Monsieur de Turenne",
       "youtubeId": "_me86LtC6oE"
     }
   ],
-  "148": [
+  "149": [
     {
       "title": "Réveillez-vous Picards",
       "youtubeId": "GG12s6zB_7k"
     }
   ],
-  "149": [
+  "150": [
     {
       "title": "Les Lansquenets",
       "youtubeId": "9M6_ZQeJs-4"
     }
   ],
-  "150": [
+  "151": [
     {
       "title": "Les Dragons de Noailles",
       "youtubeId": "Neupp7Ggy6w"
     }
   ],
-  "151": [
+  "152": [
     {
       "title": "Déjà mal mariée",
       "youtubeId": "TkyIaWnMFhQ"
     }
   ],
-  "152": [
+  "153": [
     {
       "title": "Les Partisans blancs",
       "youtubeId": "AbrpFagWLDw"
     }
   ],
-  "153": [
+  "154": [
     {
       "title": "La mort de Saint François",
       "youtubeId": "JQtal7OqyXQ"
     }
   ],
-  "154": [
+  "155": [
     {
       "title": "La légende de Saint Nicolas",
       "youtubeId": "M9steij7LEM"
-    }
-  ],
-  "155": [
+    },
     {
       "title": "La légende de Saint Nicolas (suite)",
       "youtubeId": "U_IEBtOEAQU"
@@ -749,7 +749,7 @@ window.audio_map_data = {
       "youtubeId": "2MeqhZdyO0E"
     }
   ],
-  "160": [
+  "162": [
     {
       "title": "La Cavalcade",
       "youtubeId": "LfUD10OrttY"
@@ -971,7 +971,7 @@ window.audio_map_data = {
       "youtubeId": "O7k2qzIR-3s"
     }
   ],
-  "200": [
+  "202": [
     {
       "title": "La légende du feu",
       "youtubeId": "9waoLvmwNYE"

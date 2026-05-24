@@ -491,3 +491,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
 });
+
+
+// --- Navigation Top Bar Logic ---
+!function(){
+  var w=document.querySelector(".wrap-nav"),b=document.querySelector(".bar");
+  if(!w||!b)return;
+  var cur=(w.getAttribute("data-current-tab")||new URLSearchParams(location.search).get("tab")||"documentation").toLowerCase();
+  if(!b.querySelector(".tab.active"))
+    b.querySelector(".tab[data-tab='"+cur+"']")?.classList.add("active");
+  function fit(){
+    b.style.transform="scale(1)";
+    var pw=(w.parentElement||w).clientWidth||w.clientWidth;
+    var s=Math.min(1,pw/b.scrollWidth);
+    b.style.transform="scale("+s.toFixed(4)+")";
+    w.style.height=Math.ceil(b.offsetHeight*s)+"px";
+  }
+  fit();
+  window.addEventListener("resize",fit);
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(w.parentElement||w);
+}();
+
+
+// --- Keyboard Navigation (Left/Right Arrows) ---
+document.addEventListener('keydown', function(e) {
+    // Ne pas interférer si l'utilisateur tape dans la barre de recherche
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+    
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        const container = document.getElementById('book-container');
+        if (!container) return;
+        
+        const pages = Array.from(document.querySelectorAll('.page'));
+        if (pages.length === 0) return;
+        
+        // Find the page currently most visible or at the top
+        let currentPageIndex = 0;
+        let minDistance = Infinity;
+        
+        const containerRect = container.getBoundingClientRect();
+        
+        pages.forEach((page, index) => {
+            const rect = page.getBoundingClientRect();
+            // Distance from the top of the container
+            const distance = Math.abs(rect.top - containerRect.top);
+            if (distance < minDistance) {
+                minDistance = distance;
+                currentPageIndex = index;
+            }
+        });
+        
+        let targetIndex = currentPageIndex;
+        if (e.key === 'ArrowRight') {
+            targetIndex = Math.min(currentPageIndex + 1, pages.length - 1);
+        } else if (e.key === 'ArrowLeft') {
+            targetIndex = Math.max(currentPageIndex - 1, 0);
+        }
+        
+        if (targetIndex !== currentPageIndex) {
+            e.preventDefault(); // Prevent default scrolling
+            pages[targetIndex].scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
