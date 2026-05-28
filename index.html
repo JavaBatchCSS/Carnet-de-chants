@@ -6,10 +6,32 @@
     <title>Carnet de Chants</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+      /* Use the same side spacing as the search bar and avoid a hard 100px margin.
+        Allow horizontal scrolling if tabs overflow so nothing gets hidden. */
+      /* Center the nav and give it a limited max width so it floats with side margins */
+      .wrap-nav { width: auto !important; padding: 0 1rem !important; margin: 0.35rem auto !important; box-sizing: border-box; }
+      .wrap-nav .bar { width: 100% !important; max-width: 1500px !important; margin: 0 auto !important; padding: 0.35rem 0.5rem !important; display: flex; align-items: center; justify-content: space-between; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      /* Reduce the space between the tab bar and the search bar */
+      .search-bar { margin-top: 0.25rem !important; padding-top: 0.25rem !important; }
+
+      /* Remove side padding on header container so nav reaches edges */
+      #global-header { padding-left: 0 !important; padding-right: 0 !important; }
+
+      /* Slightly tighten tab spacing and ensure tabs are visible (scroll if needed) */
+      .wrap-nav .bar .tab { margin: 0 0.25rem !important; padding: 0.45rem 0.5rem !important; white-space: nowrap; flex-shrink: 0; }
+    </style>
 </head>
 <body>
 
     <div id="global-header">
+        <!-- <h1 class="app-title" style="text-align:center; color:#ffffff; font-family:'Cormorant Garamond', serif; font-weight:800; font-size:3rem; margin:0.2rem 0;">
+          <span style="vertical-align:middle;">Carnet de Chants</span>
+        </h1>
+        <h2 class="app-title" style="text-align:center; color:#ffffff; font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1rem; margin:0.2rem 0;">
+          <span style="vertical-align:middle;">Troupe Saint Elme</span>
+        </h2> -->
         <!-- Navigation principale -->
         <nav class="wrap-nav" data-current-tab="" aria-label="Navigation principale">
           <div class="bar">
@@ -95,5 +117,31 @@
     <script src="public/page-content.js"></script>
     
     <script src="app.js"></script>
+    <script>
+      (function adjustBookOffset(){
+        const header = document.getElementById('global-header');
+        const book = document.getElementById('book-container');
+        if (!header || !book) return;
+        function update(){
+          const h = Math.ceil(header.getBoundingClientRect().height);
+          // add small gap so the title isn't flush against the header
+          const gap = 8;
+          book.style.paddingTop = (h + gap) + 'px';
+          book.style.scrollPaddingTop = (h + gap) + 'px';
+        }
+        window.addEventListener('resize', update);
+        window.addEventListener('load', update);
+        document.addEventListener('DOMContentLoaded', update);
+        if (window.ResizeObserver) {
+          try {
+            const ro = new ResizeObserver(update);
+            ro.observe(header);
+          } catch (e) {
+            // ignore if ResizeObserver not available or errors
+          }
+        }
+        update();
+      })();
+    </script>
 </body>
 </html>

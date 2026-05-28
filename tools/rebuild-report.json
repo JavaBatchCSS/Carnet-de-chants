@@ -1,0 +1,65 @@
+{
+  "pdf_path": "C:\\Users\\combe\\Documents\\JEAN-BAPTISTE\\Kimi_Agent_Deployment_v4\\app\\Carnet chants version déf 2024.pdf",
+  "cover_image": "C:\\Users\\combe\\Documents\\JEAN-BAPTISTE\\Kimi_Agent_Deployment_v4\\app\\public\\pdf-pages\\pdf_cover.png",
+  "owner_image": "C:\\Users\\combe\\Documents\\JEAN-BAPTISTE\\Kimi_Agent_Deployment_v4\\app\\public\\pdf-pages\\pdf_owner.png",
+  "back_image": "C:\\Users\\combe\\Documents\\JEAN-BAPTISTE\\Kimi_Agent_Deployment_v4\\app\\public\\pdf-pages\\pdf_back.png",
+  "section_pages": {
+    "5": "Chants de prières",
+    "25": "Chants scouts",
+    "69": "Chants marins",
+    "113": "Chants de Tradition",
+    "161": "Chants de guerre",
+    "201": "Chants de veillée"
+  },
+  "toc_pages": [
+    231,
+    232,
+    233,
+    234,
+    235,
+    236,
+    237,
+    238,
+    239,
+    240
+  ],
+  "unmatched_pages": [
+    160,
+    200,
+    241,
+    242,
+    243
+  ],
+  "illustration_pages": [
+    160,
+    200,
+    241,
+    242,
+    243
+  ],
+  "raw_text_pages": [],
+  "duplicate_titles": [
+    "Vagabonde",
+    "L'aventure",
+    "Au camp",
+    "Au camp",
+    "Être prêt",
+    "Il était un petit navire",
+    "Cœur de Jésus",
+    "Monsieur de Charette",
+    "Sur la route",
+    "L'Espérance",
+    "L'aventure",
+    "L'aventure",
+    "Eugénie",
+    "L'aventure",
+    "Sur la route",
+    "Notre Patrie",
+    "La montagne",
+    "Sur la route",
+    "La montagne",
+    "La montagne"
+  ],
+  "unmatched_titles": [],
+  "title_matches": {}
+}

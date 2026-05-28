@@ -119,89 +119,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = htmlContent;
 
-                // Make titles link back to sommaire and append play buttons under them
+                // Make titles link back to sommaire only (audio stays in floating overlay)
                 const titles = tempDiv.querySelectorAll('.song-title');
-                const matchedAudioTitles = new Set();
-                const matchedTitleElements = new Set();
-
-                // First pass: match titles to audio map entries
                 titles.forEach(titleElement => {
-                    const titleText = titleElement.textContent.trim();
                     titleElement.title = "Retour au sommaire";
                     titleElement.addEventListener('click', () => {
                         scrollToId('sommaire');
                     });
-
-                    // Add play button if the song has matching audio in the map
-                    if (audioMap[i.toString()]) {
-                        // Normalize string to match titles robustly (ignoring case, accents, and non-alphanumeric chars)
-                        const cleanSongTitle = titleText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
-                        
-                        const songAudio = audioMap[i.toString()].find(aud => {
-                            const cleanAudTitle = aud.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
-                            return cleanAudTitle === cleanSongTitle || cleanSongTitle.includes(cleanAudTitle) || cleanAudTitle.includes(cleanSongTitle);
-                        });
-
-                        if (songAudio) {
-                            matchedAudioTitles.add(songAudio.title);
-                            matchedTitleElements.add(titleElement);
-                            
-                            if (songAudio.youtubeId !== 'NONE') {
-                                const playContainer = document.createElement('div');
-                                playContainer.className = 'song-play-container';
-
-                                const btn = document.createElement('button');
-                                btn.className = 'song-play-btn';
-                                btn.innerHTML = `<span>▶</span> Écouter le chant`;
-                                btn.onclick = (e) => {
-                                    e.stopPropagation(); // Prevent returning to sommaire
-                                    playAudio(songAudio.title, songAudio.youtubeId);
-                                };
-
-                                playContainer.appendChild(btn);
-                                titleElement.parentNode.insertBefore(playContainer, titleElement.nextSibling);
-                            }
-                        }
-                    }
                 });
-
-                // Second pass: for title elements that didn't match any audio, add a YouTube search button
-                titles.forEach(titleElement => {
-                    if (!matchedTitleElements.has(titleElement)) {
-                        const titleText = titleElement.textContent.trim();
-                        const playContainer = document.createElement('div');
-                        playContainer.className = 'song-play-container';
-
-                        const btn = document.createElement('button');
-                        btn.className = 'song-play-btn search-btn';
-                        btn.innerHTML = `<span>🔍</span> Rechercher sur YouTube`;
-                        btn.onclick = (e) => {
-                            e.stopPropagation();
-                            const query = encodeURIComponent(`${titleText} Choeur Montjoie OR Sapiens OR Padres`);
-                            window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
-                        };
-
-                        playContainer.appendChild(btn);
-                        titleElement.parentNode.insertBefore(playContainer, titleElement.nextSibling);
-                    }
-                });
-
-                // Fallback for any audio mapped to this page that didn't match a title element
-                if (audioMap[i.toString()]) {
-                    const unmatchedAudios = audioMap[i.toString()].filter(aud => !matchedAudioTitles.has(aud.title) && aud.youtubeId !== 'NONE');
-                    unmatchedAudios.forEach(aud => {
-                        const playContainer = document.createElement('div');
-                        playContainer.className = 'song-play-container';
-
-                        const btn = document.createElement('button');
-                        btn.className = 'song-play-btn';
-                        btn.innerHTML = `<span>▶</span> Écouter : ${aud.title}`;
-                        btn.onclick = () => playAudio(aud.title, aud.youtubeId);
-
-                        playContainer.appendChild(btn);
-                        tempDiv.appendChild(playContainer);
-                    });
-                }
 
                 wrapper.appendChild(tempDiv);
             }

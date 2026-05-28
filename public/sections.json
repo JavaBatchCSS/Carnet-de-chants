@@ -9,14 +9,14 @@
   "chants-scouts": {
     "name": "Chants Scouts",
     "start": 26,
-    "end": 67,
+    "end": 68,
     "icon": "⚜",
     "id": "chants-scouts"
   },
   "chants-marins": {
     "name": "Chants Marins",
-    "start": 68,
-    "end": 95,
+    "start": 70,
+    "end": 112,
     "icon": "⚓",
     "id": "chants-marins"
   },
@@ -30,20 +30,20 @@
   "tradition": {
     "name": "Chants de Tradition",
     "start": 114,
-    "end": 160,
+    "end": 159,
     "icon": "♔",
     "id": "tradition"
   },
   "guerre": {
     "name": "Chants de Guerre",
-    "start": 163,
+    "start": 162,
     "end": 199,
     "icon": "⚔",
     "id": "guerre"
   },
   "soir": {
     "name": "Chants de Veillée",
-    "start": 203,
+    "start": 202,
     "end": 230,
     "icon": "☽",
     "id": "soir"
