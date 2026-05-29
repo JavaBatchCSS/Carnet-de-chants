@@ -3,10 +3,11 @@
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${src}"]`);
-    if (existing) { resolve(); return; }
+    const existing = document.querySelector(`script[data-source="${src}"]`);
+    if (existing) existing.remove();
     const s = document.createElement('script');
-    s.src = src;
+    s.dataset.source = src;
+    s.src = `${src}${src.includes('?') ? '&' : '?'}v=${Date.now()}`;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error('Impossible de charger ' + src));
     document.head.appendChild(s);
@@ -27,6 +28,8 @@ async function loadData() {
   const statusEl = document.getElementById('load-status');
   if(statusEl) statusEl.textContent = 'Chargement des index…';
 
+  delete window.songs_index_data;
+  delete window.audio_map_data;
   await loadScript('public/songs-index.js');
   await loadScript('public/audio-map.js');
 

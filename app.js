@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async () => {
+function startCarnetApp() {
     const bookContainer = document.getElementById('book-container');
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
@@ -244,6 +244,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function repairMojibake(value) {
+        try {
+            return decodeURIComponent(escape(value));
+        } catch (e) {
+            return value;
+        }
+    }
+
+    function cleanTitle(value) {
+        return (value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+    }
+
+    function titleVariants(value) {
+        return Array.from(new Set([value, repairMojibake(value)].map(cleanTitle).filter(Boolean)));
+    }
+
+    function titlesMatch(pageTitle, audioTitle) {
+        const pageVariants = titleVariants(pageTitle);
+        const audioVariants = titleVariants(audioTitle);
+        return pageVariants.some(pageValue =>
+            audioVariants.some(audioValue =>
+                pageValue === audioValue ||
+                pageValue.includes(audioValue) ||
+                audioValue.includes(pageValue)
+            )
+        );
+    }
+
     function updateFloatingControls(pageDiv) {
         if (!pageDiv) return;
 
@@ -260,11 +292,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Find if this song has an audio match
         let songAudio = null;
         if (audioMap[pageNum]) {
-            const cleanSongTitle = titleText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
-            songAudio = audioMap[pageNum].find(aud => {
-                const cleanAudTitle = aud.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
-                return cleanAudTitle === cleanSongTitle || cleanSongTitle.includes(cleanAudTitle) || cleanAudTitle.includes(cleanSongTitle);
-            });
+            const pageAudios = audioMap[pageNum].filter(aud => aud.youtubeId && aud.youtubeId !== 'NONE');
+            songAudio = pageAudios.find(aud => titlesMatch(titleText, aud.title));
+            if (!songAudio && pageAudios.length === 1) {
+                songAudio = pageAudios[0];
+            }
         }
 
         currentSongTitle.textContent = titleText;
@@ -415,7 +447,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startCarnetApp);
+} else {
+    startCarnetApp();
+}
 
 
 // --- Navigation Top Bar Logic ---
