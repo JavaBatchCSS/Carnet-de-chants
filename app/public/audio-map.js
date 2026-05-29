@@ -32,7 +32,7 @@ window.audio_map_data = {
   "7": [
     {
       "title": "Cœur de Jésus",
-      "youtubeId": "prqOrcS7yu4"
+      "youtubeId": "661gmeK7aSQ"
     }
   ],
   "9": [
@@ -50,7 +50,7 @@ window.audio_map_data = {
   "11": [
     {
       "title": "Cantique des patrouilles",
-      "youtubeId": "o49k9mQ-jGw"
+      "youtubeId": "c6jWgfTb3BY"
     }
   ],
   "12": [
@@ -68,7 +68,7 @@ window.audio_map_data = {
   "14": [
     {
       "title": "Notre-Dame des Éclaireurs",
-      "youtubeId": "8_Uu_whgJAU"
+      "youtubeId": "MceaFtQxAVI"
     }
   ],
   "15": [
