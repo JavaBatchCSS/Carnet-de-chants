@@ -26,13 +26,13 @@ window.audio_map_data = {
   "6": [
     {
       "title": "Prière Scoute",
-      "youtubeId": "DupKoWl-3m8"
+      "youtubeId": "kTYlxC2Dms4"
     }
   ],
   "7": [
     {
       "title": "Cœur de Jésus",
-      "youtubeId": "661gmeK7aSQ"
+      "youtubeId": "prqOrcS7yu4"
     }
   ],
   "9": [
@@ -50,7 +50,7 @@ window.audio_map_data = {
   "11": [
     {
       "title": "Cantique des patrouilles",
-      "youtubeId": "c6jWgfTb3BY"
+      "youtubeId": "o49k9mQ-jGw"
     }
   ],
   "12": [
@@ -68,7 +68,7 @@ window.audio_map_data = {
   "14": [
     {
       "title": "Notre-Dame des Éclaireurs",
-      "youtubeId": "MceaFtQxAVI"
+      "youtubeId": "8_Uu_whgJAU"
     }
   ],
   "15": [
@@ -92,7 +92,7 @@ window.audio_map_data = {
   "19": [
     {
       "title": "Vierge des chemins de France",
-      "youtubeId": "fMQKV1OiB7M"
+      "youtubeId": "R_WWMNhn_jA"
     }
   ],
   "21": [
@@ -104,7 +104,7 @@ window.audio_map_data = {
   "22": [
     {
       "title": "Je mets ma confiance",
-      "youtubeId": "kwUlaDcvcqg"
+      "youtubeId": "GegPmWvelFY"
     }
   ],
   "23": [
@@ -128,7 +128,7 @@ window.audio_map_data = {
   "28": [
     {
       "title": "Les grèves",
-      "youtubeId": "ZpsExxNs_VY"
+      "youtubeId": "4_OBM7t-TBk"
     }
   ],
   "29": [
