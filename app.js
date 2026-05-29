@@ -441,12 +441,6 @@ function startCarnetApp() {
 
     closeModalBtn.addEventListener('click', cleanUpModal);
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            cleanUpModal();
-        }
-    });
-
 }
 
 if (document.readyState === 'loading') {
