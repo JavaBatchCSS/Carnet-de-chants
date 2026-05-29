@@ -423,7 +423,7 @@ function toggleSearch(tr, song, updateCallback) {
           previewContainer.innerHTML = `
             <div style="position:relative; width:100%; height:250px; margin-bottom:1rem; background:#000; border-radius:8px;">
               <iframe width="100%" height="100%" style="border:none; border-radius:8px;" 
-                src="https://yewtu.be/embed/${vidId}?autoplay=1" 
+                src="https://www.youtube-nocookie.com/embed/${vidId}?autoplay=1" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
               </iframe>
               <div style="position:absolute; top:5px; right:5px; display:flex; gap:5px;">
@@ -497,7 +497,7 @@ function togglePreview(tr, song) {
   iframe.style.background = '#000';
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
-  iframe.src = `https://yewtu.be/embed/${song.youtubeId}?autoplay=1`;
+  iframe.src = `https://www.youtube-nocookie.com/embed/${song.youtubeId}?autoplay=1`;
 
   const btnContainer = document.createElement('div');
   btnContainer.style.position = 'absolute';
