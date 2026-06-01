@@ -39,6 +39,10 @@ window.audio_map_data = {
     {
       "title": "Écoute la prière",
       "youtubeId": "NZ0H7JVZKy4"
+    },
+    {
+      "title": "Voguons au vent de mer",
+      "youtubeId": "NZ0H7JVZKy4"
     }
   ],
   "10": [
@@ -89,10 +93,22 @@ window.audio_map_data = {
       "youtubeId": "V_Jixpt0jqk"
     }
   ],
+  "18": [
+    {
+      "title": "Notre-Dame de la Paix",
+      "youtubeId": "NONE"
+    }
+  ],
   "19": [
     {
       "title": "Vierge des chemins de France",
       "youtubeId": "R_WWMNhn_jA"
+    }
+  ],
+  "20": [
+    {
+      "title": "Pour être généreux",
+      "youtubeId": "NONE"
     }
   ],
   "21": [
@@ -104,13 +120,19 @@ window.audio_map_data = {
   "22": [
     {
       "title": "Je mets ma confiance",
-      "youtubeId": "NONE"
+      "youtubeId": "T-kPuw4WeDo"
     }
   ],
   "23": [
     {
       "title": "Prière du Parachutiste",
       "youtubeId": "VoSv5MtNHfw"
+    }
+  ],
+  "24": [
+    {
+      "title": "Ô Vierge immaculée",
+      "youtubeId": "QDqhNa3j_q8"
     }
   ],
   "26": [
@@ -203,6 +225,12 @@ window.audio_map_data = {
       "youtubeId": "patj37ZYi20"
     }
   ],
+  "41": [
+    {
+      "title": "Vagabonde",
+      "youtubeId": "bzVCf9ZeHFY"
+    }
+  ],
   "42": [
     {
       "title": "Vieux pèlerin",
@@ -213,6 +241,12 @@ window.audio_map_data = {
     {
       "title": "La Bohème",
       "youtubeId": "-M5ASKCAmzk"
+    }
+  ],
+  "44": [
+    {
+      "title": "Le Chat noir",
+      "youtubeId": "wlWoz_XHNGg"
     }
   ],
   "45": [
@@ -231,6 +265,12 @@ window.audio_map_data = {
     {
       "title": "Au camp",
       "youtubeId": "nG37mgA6xCY"
+    }
+  ],
+  "48": [
+    {
+      "title": "On n'en finira donc jamais",
+      "youtubeId": "NONE"
     }
   ],
   "49": [
@@ -257,6 +297,12 @@ window.audio_map_data = {
       "youtubeId": "jf15yXYXcqc"
     }
   ],
+  "53": [
+    {
+      "title": "Chante au danger",
+      "youtubeId": "ahCm6xplC7w"
+    }
+  ],
   "54": [
     {
       "title": "Une fleur au chapeau",
@@ -266,13 +312,13 @@ window.audio_map_data = {
   "55": [
     {
       "title": "La loi scoute",
-      "youtubeId": "DK6Kj5Vlkgk"
+      "youtubeId": "lO10WudZ4m8"
     }
   ],
   "56": [
     {
       "title": "Sur mon honneur",
-      "youtubeId": "19Sy0OyXk58"
+      "youtubeId": "NONE"
     },
     {
       "title": "Montjoie",
@@ -288,7 +334,7 @@ window.audio_map_data = {
   "59": [
     {
       "title": "La marche au camp",
-      "youtubeId": "NQcTgi_KprI"
+      "youtubeId": "NONE"
     }
   ],
   "64": [
@@ -300,7 +346,7 @@ window.audio_map_data = {
   "65": [
     {
       "title": "Chant de Troupe",
-      "youtubeId": "e1g1Q3lySPk"
+      "youtubeId": "NONE"
     }
   ],
   "66": [
