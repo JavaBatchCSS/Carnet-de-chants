@@ -35,15 +35,9 @@ window.audio_map_data = {
       "youtubeId": "prqOrcS7yu4"
     }
   ],
-  "8": [
-    {
-      "title": "Ô Jésus, reste avec nous !",
-      "youtubeId": "HIo73VHuWHQ"
-    }
-  ],
   "9": [
     {
-      "title": "Voguons au vent de mer",
+      "title": "Écoute la prière",
       "youtubeId": "NZ0H7JVZKy4"
     }
   ],
@@ -104,13 +98,13 @@ window.audio_map_data = {
   "21": [
     {
       "title": "Mater Alma",
-      "youtubeId": "0VeIX9_PZ_Q"
+      "youtubeId": "gtiFb12UZDA"
     }
   ],
   "22": [
     {
       "title": "Je mets ma confiance",
-      "youtubeId": "GegPmWvelFY"
+      "youtubeId": "NONE"
     }
   ],
   "23": [
@@ -122,7 +116,7 @@ window.audio_map_data = {
   "26": [
     {
       "title": "Ô ma troupe",
-      "youtubeId": "ysOU00W8iRk"
+      "youtubeId": "I7HAtcEet3g"
     }
   ],
   "27": [
@@ -140,7 +134,7 @@ window.audio_map_data = {
   "29": [
     {
       "title": "Va, scout de France !",
-      "youtubeId": "tQaGAUhgeEc"
+      "youtubeId": "xOrYZZxD0So"
     }
   ],
   "30": [
@@ -152,7 +146,7 @@ window.audio_map_data = {
   "31": [
     {
       "title": "Youkaïdi",
-      "youtubeId": "55RBP6uZ94M"
+      "youtubeId": "rup4bVZLSmw"
     }
   ],
   "32": [
@@ -170,7 +164,7 @@ window.audio_map_data = {
   "34": [
     {
       "title": "L'Espérance",
-      "youtubeId": "Bo1s03VUL50"
+      "youtubeId": "QrhH_Pi-1mA"
     }
   ],
   "35": [
@@ -355,6 +349,18 @@ window.audio_map_data = {
     {
       "title": "Les marins de Groix",
       "youtubeId": "dBIO2u2zOyY"
+    }
+  ],
+  "82": [
+    {
+      "title": "Santiano",
+      "youtubeId": "un_xO9RWKbs"
+    }
+  ],
+  "83": [
+    {
+      "title": "Ceux qu’ont nommé les bancs",
+      "youtubeId": "cxvZLaPf8Fw"
     }
   ],
   "85": [
@@ -646,7 +652,7 @@ window.audio_map_data = {
   "144": [
     {
       "title": "Les Terres Saintes",
-      "youtubeId": "FTveHIDZmMM"
+      "youtubeId": "jsZD-Xw-pDU"
     }
   ],
   "145": [
