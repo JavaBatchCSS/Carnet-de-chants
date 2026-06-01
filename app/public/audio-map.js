@@ -35,6 +35,12 @@ window.audio_map_data = {
       "youtubeId": "prqOrcS7yu4"
     }
   ],
+  "8": [
+    {
+      "title": "Ô Jésus, reste avec nous !",
+      "youtubeId": "NONE"
+    }
+  ],
   "9": [
     {
       "title": "Écoute la prière",
@@ -331,6 +337,12 @@ window.audio_map_data = {
       "youtubeId": "RkQW7MaGTmA"
     }
   ],
+  "58": [
+    {
+      "title": "Sortie d'hiver",
+      "youtubeId": "VcCV57hIy84"
+    }
+  ],
   "59": [
     {
       "title": "La marche au camp",
@@ -383,6 +395,12 @@ window.audio_map_data = {
     {
       "title": "La Danaé",
       "youtubeId": "SrgNTZfhLy4"
+    }
+  ],
+  "74": [
+    {
+      "title": "Le Corsaire le grand coureur",
+      "youtubeId": "RUKD_CAtrGE"
     }
   ],
   "75": [
