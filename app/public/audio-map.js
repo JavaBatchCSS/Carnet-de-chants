@@ -35,6 +35,12 @@ window.audio_map_data = {
       "youtubeId": "prqOrcS7yu4"
     }
   ],
+  "8": [
+    {
+      "title": "Ô Jésus, reste avec nous !",
+      "youtubeId": "HIo73VHuWHQ"
+    }
+  ],
   "9": [
     {
       "title": "Voguons au vent de mer",
@@ -50,13 +56,13 @@ window.audio_map_data = {
   "11": [
     {
       "title": "Cantique des patrouilles",
-      "youtubeId": "o49k9mQ-jGw"
+      "youtubeId": "c6jWgfTb3BY"
     }
   ],
   "12": [
     {
       "title": "Miserere de la mer",
-      "youtubeId": "iZKDf1QPu50"
+      "youtubeId": "rhjbR01MDOI"
     }
   ],
   "13": [
@@ -68,7 +74,7 @@ window.audio_map_data = {
   "14": [
     {
       "title": "Notre-Dame des Éclaireurs",
-      "youtubeId": "8_Uu_whgJAU"
+      "youtubeId": "fPYxyICjMmc"
     }
   ],
   "15": [
@@ -98,7 +104,7 @@ window.audio_map_data = {
   "21": [
     {
       "title": "Mater Alma",
-      "youtubeId": "9K7mxZaKZ40"
+      "youtubeId": "0VeIX9_PZ_Q"
     }
   ],
   "22": [
@@ -128,7 +134,7 @@ window.audio_map_data = {
   "28": [
     {
       "title": "Les grèves",
-      "youtubeId": "4_OBM7t-TBk"
+      "youtubeId": "ZpsExxNs_VY"
     }
   ],
   "29": [
