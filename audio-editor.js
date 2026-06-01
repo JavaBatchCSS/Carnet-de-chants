@@ -18,6 +18,69 @@ let allSongs = [];
 let modified = false;
 let currentFilter = 'all';
 
+function repairMojibake(value) {
+  try {
+    return decodeURIComponent(escape(value));
+  } catch (e) {
+    return value;
+  }
+}
+
+function cleanTitle(value) {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function titlesMatch(left, right) {
+  const leftValues = Array.from(new Set([left, repairMojibake(left)].map(cleanTitle).filter(Boolean)));
+  const rightValues = Array.from(new Set([right, repairMojibake(right)].map(cleanTitle).filter(Boolean)));
+  return leftValues.some(a => rightValues.some(b => a === b));
+}
+
+function extractYoutubeId(value) {
+  const raw = (value || '').trim();
+  if (!raw || raw === 'NONE') return raw;
+  const patterns = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube(?:-nocookie)?\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+    /[?&]v=([A-Za-z0-9_-]{11})/
+  ];
+  for (const pattern of patterns) {
+    const match = raw.match(pattern);
+    if (match) return match[1];
+  }
+  return raw;
+}
+
+function getYoutubeThumbnail(youtubeId) {
+  const id = extractYoutubeId(youtubeId);
+  if (!id || id === 'NONE') return '';
+  return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+}
+
+function renderCoverCell(cell, youtubeId, title) {
+  cell.innerHTML = '';
+  const thumb = getYoutubeThumbnail(youtubeId);
+  if (!thumb) {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'cover-placeholder';
+    placeholder.textContent = '—';
+    cell.appendChild(placeholder);
+    return;
+  }
+  const img = document.createElement('img');
+  img.className = 'cover-thumb';
+  img.src = thumb;
+  img.alt = `Couverture ${title}`;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  cell.appendChild(img);
+}
+
 function markModified() {
   modified = true;
   const indicator = document.getElementById('save-indicator');
@@ -36,26 +99,51 @@ async function loadData() {
   const songsIndex = window.songs_index_data || [];
   const audioMap = window.audio_map_data || {};
 
-  const audioLookup = {};
-  Object.entries(audioMap).forEach(([page, entries]) => {
-    entries.forEach(e => {
-      const key = `${page}::${e.title}`;
-      audioLookup[key] = e.youtubeId || '';
-    });
-  });
+  const usedAudioByPage = {};
+  const pageSongIndexes = {};
+
+  function findAudioForSong(song) {
+    const pageKey = String(song.page);
+    const entries = audioMap[pageKey] || [];
+    if (!usedAudioByPage[pageKey]) usedAudioByPage[pageKey] = new Set();
+    const used = usedAudioByPage[pageKey];
+    const songIndex = pageSongIndexes[pageKey] || 0;
+    pageSongIndexes[pageKey] = songIndex + 1;
+
+    const matchedIndex = entries.findIndex((entry, idx) =>
+      !used.has(idx) && titlesMatch(song.title, entry.title)
+    );
+    if (matchedIndex >= 0) {
+      used.add(matchedIndex);
+      return entries[matchedIndex];
+    }
+
+    if (entries[songIndex] && !used.has(songIndex)) {
+      used.add(songIndex);
+      return entries[songIndex];
+    }
+
+    const nextUnusedIndex = entries.findIndex((_, idx) => !used.has(idx));
+    if (nextUnusedIndex >= 0) {
+      used.add(nextUnusedIndex);
+      return entries[nextUnusedIndex];
+    }
+
+    return null;
+  }
 
   // Filtrer les pages >= 1 et trier par page
   allSongs = songsIndex
     .filter(s => s.page >= 1)
     .sort((a, b) => a.page - b.page)
     .map(s => {
-      const key = `${s.page}::${s.title}`;
+      const audioEntry = findAudioForSong(s);
       return {
         title: s.title,
         page: s.page,
         section: s.section || 'unknown',
         sectionName: s.sectionName || 'Autres',
-        youtubeId: audioLookup[key] || ''
+        youtubeId: audioEntry?.youtubeId || ''
       };
     });
 
@@ -111,6 +199,10 @@ function createRow(song, index, songsOnPage) {
   titleSpan.textContent = song.title;
   tdTitle.appendChild(titleSpan);
 
+  const tdCover = document.createElement('td');
+  tdCover.className = 'col-cover';
+  renderCoverCell(tdCover, song.youtubeId, song.title);
+
   const tdStatus = document.createElement('td');
   tdStatus.className = 'col-status';
   tdStatus.innerHTML = statusInfo.html;
@@ -124,20 +216,25 @@ function createRow(song, index, songsOnPage) {
   const input = document.createElement('input');
   input.type = 'text';
   input.value = song.youtubeId === 'NONE' ? '' : song.youtubeId;
-  input.placeholder = song.youtubeId === 'NONE' ? '(Ignoré)' : 'ID YouTube';
+  input.placeholder = song.youtubeId === 'NONE' ? '(Ignoré)' : 'ID ou URL YouTube';
   
   const updateRowState = () => {
     const info = getStatusInfo(song.youtubeId);
     tr.className = info.class;
     tdStatus.innerHTML = info.html;
     input.value = song.youtubeId === 'NONE' ? '' : song.youtubeId;
-    input.placeholder = song.youtubeId === 'NONE' ? '(Ignoré)' : 'ID YouTube';
+    input.placeholder = song.youtubeId === 'NONE' ? '(Ignoré)' : 'ID ou URL YouTube';
+    renderCoverCell(tdCover, song.youtubeId, song.title);
     markModified();
     updateStats();
   };
 
   input.addEventListener('input', () => {
     song.youtubeId = input.value.trim();
+    updateRowState();
+  });
+  input.addEventListener('change', () => {
+    song.youtubeId = extractYoutubeId(input.value);
     updateRowState();
   });
 
@@ -169,6 +266,7 @@ function createRow(song, index, songsOnPage) {
   tdAction.appendChild(inputWrap);
 
   tr.appendChild(tdPage);
+  tr.appendChild(tdCover);
   tr.appendChild(tdTitle);
   tr.appendChild(tdStatus);
   tr.appendChild(tdAction);
@@ -316,7 +414,7 @@ function toggleSearch(tr, song, updateCallback) {
   const searchTr = document.createElement('tr');
   searchTr.className = 'search-row';
   const searchTd = document.createElement('td');
-  searchTd.colSpan = 4;
+  searchTd.colSpan = 5;
 
   const searchBar = document.createElement('div');
   searchBar.className = 'search-bar';
@@ -480,13 +578,14 @@ function togglePreview(tr, song) {
     next.remove();
     return;
   }
-  if (!song.youtubeId || song.youtubeId === 'NONE') return;
+  const videoId = extractYoutubeId(song.youtubeId);
+  if (!videoId || videoId === 'NONE') return;
   document.querySelectorAll('.search-row, .preview-row').forEach(r => r.remove());
 
   const prevTr = document.createElement('tr');
   prevTr.className = 'preview-row';
   const td = document.createElement('td');
-  td.colSpan = 4;
+  td.colSpan = 5;
   td.style.position = 'relative';
 
   const iframe = document.createElement('iframe');
@@ -497,7 +596,7 @@ function togglePreview(tr, song) {
   iframe.style.background = '#000';
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
-  iframe.src = `https://www.youtube-nocookie.com/embed/${song.youtubeId}?autoplay=1`;
+  iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
 
   const btnContainer = document.createElement('div');
   btnContainer.style.position = 'absolute';
@@ -507,7 +606,7 @@ function togglePreview(tr, song) {
   btnContainer.style.gap = '5px';
 
   const openBtn = document.createElement('a');
-  openBtn.href = `https://www.youtube.com/watch?v=${song.youtubeId}`;
+  openBtn.href = `https://www.youtube.com/watch?v=${videoId}`;
   openBtn.target = '_blank';
   openBtn.textContent = '↗ Ouvrir sur YouTube';
   openBtn.className = 'secondary-btn';
@@ -559,7 +658,7 @@ function renderTable() {
       currentSection = song.sectionName;
       const secTr = document.createElement('tr');
       secTr.className = 'section-header';
-      secTr.innerHTML = `<td colspan="4">${currentSection}</td>`;
+      secTr.innerHTML = `<td colspan="5">${currentSection}</td>`;
       tbody.appendChild(secTr);
       lastPage = null; // reset pour le séparateur de page
     }
@@ -581,10 +680,11 @@ function renderTable() {
 function generateContent() {
   const audioMap = {};
   allSongs.forEach(s => {
-    if (s.youtubeId) {
+    const youtubeId = extractYoutubeId(s.youtubeId);
+    if (youtubeId) {
       const pageKey = String(s.page);
       if (!audioMap[pageKey]) audioMap[pageKey] = [];
-      audioMap[pageKey].push({ title: s.title, youtubeId: s.youtubeId });
+      audioMap[pageKey].push({ title: s.title, youtubeId });
     }
   });
   return `window.audio_map_data = ${JSON.stringify(audioMap, null, 2)};\n`;

@@ -1,4 +1,4 @@
- :root {
+﻿ :root {
     --bg-color: #dcd7ca; /* Fond de l'écran (hors page) : beige neutre et doux */
     --page-bg: #fcfaf5; /* Beige très clair pour la feuille de papier */
     --text-color: #1a2536; /* Bleu très foncé pour le texte */
@@ -268,7 +268,8 @@ body {
 /* Passer à 1 colonne sur petits écrans */
 @media (max-width: 900px) {
     .sommaire-list {
-        column-count: 1;
+        column-count: 2;
+        column-gap: 18px;
     }
     .page {
         aspect-ratio: auto;
@@ -277,12 +278,14 @@ body {
         width: 95%;
         max-width: 100%;
         max-height: none;
-        padding: 30px 20px 50px 20px; /* Augmenté padding bas pour pagination sur mobile */
+        padding: 18px 14px 42px 14px;
         margin: 15px auto;
     }
     .page-content-wrapper {
         overflow-y: visible; /* Laisse le contenu s'étendre naturellement */
         justify-content: flex-start;
+        font-size: 13px;
+        line-height: 1.32;
     }
 }
 
@@ -331,6 +334,32 @@ body {
 }
 .song-title:hover {
     opacity: 0.7;
+}
+
+.inline-song-audio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 12px;
+    padding: 5px 10px;
+    border: 1px solid var(--accent-color);
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: var(--white);
+    font-family: var(--font-text);
+    font-size: 13px;
+    font-weight: 700;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.inline-song-audio-btn.search {
+    background: transparent;
+    color: var(--accent-color);
+}
+
+.inline-song-audio-btn:hover {
+    opacity: 0.9;
 }
 
 .citation {
@@ -627,6 +656,7 @@ body {
     padding-left: 30px;
     border-left: 3px solid var(--accent-color);
     color: #2d3748;
+    text-align: left !important;
 }
 
 .refrain-label {
@@ -640,6 +670,7 @@ body {
     margin-bottom: 20px;
     position: relative;
     padding-left: 30px;
+    text-align: left !important;
 }
 
 .verse-number {
@@ -776,6 +807,52 @@ body {
     transform: translateY(20px);
 }
 
+.floating-song-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+#current-song-title.multi-song {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.floating-song-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.floating-song-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--accent-color);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.floating-song-btn {
+    border: none;
+    border-radius: 14px;
+    padding: 4px 9px;
+    background: var(--accent-color);
+    color: var(--white);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.floating-song-btn.search {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
 .controls-current-song {
     display: flex;
     align-items: center;
@@ -826,45 +903,108 @@ body {
     transform: scale(1.03);
 }
 
-.column-selector {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    background: rgba(0, 0, 0, 0.04);
-    padding: 2px;
-    border-radius: 20px;
-}
+@media (max-width: 900px) {
+    .page-content-wrapper,
+    .book-cols-1 .page:not(#sommaire):not([id^="sommaire"]):not(.section-page) .page-content-wrapper,
+    .book-cols-2 .page:not(#sommaire):not([id^="sommaire"]):not(.section-page) .page-content-wrapper,
+    .book-cols-3 .page:not(#sommaire):not([id^="sommaire"]):not(.section-page) .page-content-wrapper {
+        column-count: 1 !important;
+        column-gap: 0 !important;
+    }
 
-.selector-label {
-    font-size: 11px;
-    font-weight: bold;
-    color: #5a6578;
-    margin-left: 6px;
-    margin-right: 4px;
-}
+    .two-columns,
+    .columns,
+    .two-column,
+    .three-columns,
+    .three-column {
+        column-count: 1 !important;
+        column-gap: 0 !important;
+        display: block !important;
+    }
 
-.col-btn {
-    background: transparent;
-    border: none;
-    padding: 3px 7px;
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--text-color);
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.15s;
-}
+    .column,
+    .col-3 {
+        display: block !important;
+        width: 100% !important;
+    }
 
-.col-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
+    .toc-columns {
+        display: flex !important;
+        gap: 12px !important;
+        column-count: 2 !important;
+    }
 
-.col-btn.active {
-    background: var(--accent-color);
-    color: var(--white);
-}
+    .toc-column {
+        width: 50% !important;
+        flex: 1 1 0 !important;
+    }
 
-@media (max-width: 600px) {
+    .song-title {
+        font-size: 22px;
+        line-height: 1.08;
+        margin: 14px 0 8px 0;
+    }
+
+    .sommaire-title {
+        font-size: 28px;
+        margin-bottom: 18px;
+        padding-bottom: 8px;
+    }
+
+    .sommaire-list {
+        column-count: 2 !important;
+        column-gap: 18px !important;
+        font-size: 12px;
+    }
+
+    .sommaire-item {
+        padding: 4px 0;
+    }
+
+    .sommaire-item a,
+    .sommaire-page {
+        font-size: 12px;
+    }
+
+    .verse {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        line-height: 1.28;
+    }
+
+    .refrain {
+        margin: 10px 0;
+        padding-left: 16px;
+        font-size: 13px;
+        line-height: 1.28;
+    }
+
+    .prayer {
+        margin: 10px 0;
+        font-size: 14px;
+        line-height: 1.35;
+    }
+
+    .citation,
+    .author,
+    .toc-line,
+    .toc-raw,
+    .page-raw-text {
+        font-size: 12px;
+        line-height: 1.28;
+    }
+
+    .toc-title {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .inline-song-audio-btn {
+        display: flex;
+        width: max-content;
+        margin: 8px auto 0;
+    }
+
     .floating-controls {
         left: 20px;
         right: 20px;
@@ -897,3 +1037,4 @@ body {
     display: flex;
     flex-direction: column;
 }
+

@@ -24,7 +24,6 @@ function startCarnetApp() {
         buildContentPages();
         setupSearch();
         setupFloatingControlsObserver();
-        setupColumnSwitcher();
         
         // Initial scroll to hash if present
         setTimeout(handleHashChange, 100);
@@ -122,6 +121,24 @@ function startCarnetApp() {
                 // Make titles link back to sommaire only (audio stays in floating overlay)
                 const titles = tempDiv.querySelectorAll('.song-title');
                 titles.forEach(titleElement => {
+                    const titleText = titleElement.textContent.trim();
+                    const songAudio = findAudioForTitle(String(i), titleText);
+                    const audioButton = document.createElement('button');
+                    audioButton.type = 'button';
+                    audioButton.className = songAudio ? 'inline-song-audio-btn' : 'inline-song-audio-btn search';
+                    audioButton.textContent = songAudio ? '▶ Écouter' : '🔍 Audio';
+                    audioButton.title = songAudio ? `Écouter ${titleText}` : `Rechercher ${titleText} sur YouTube`;
+                    audioButton.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (songAudio) {
+                            playAudio(songAudio.title, songAudio.youtubeId);
+                        } else {
+                            const query = encodeURIComponent(`${titleText} Choeur Montjoie OR Sapiens OR Padres`);
+                            window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+                        }
+                    });
+                    titleElement.appendChild(audioButton);
                     titleElement.title = "Retour au sommaire";
                     titleElement.addEventListener('click', () => {
                         scrollToId('sommaire');
@@ -264,6 +281,12 @@ function startCarnetApp() {
         return Array.from(new Set([value, repairMojibake(value)].map(cleanTitle).filter(Boolean)));
     }
 
+    function getSongTitleText(titleElement) {
+        const clone = titleElement.cloneNode(true);
+        clone.querySelectorAll('.inline-song-audio-btn').forEach(button => button.remove());
+        return clone.textContent.trim();
+    }
+
     function titlesMatch(pageTitle, audioTitle) {
         const pageVariants = titleVariants(pageTitle);
         const audioVariants = titleVariants(audioTitle);
@@ -276,28 +299,85 @@ function startCarnetApp() {
         );
     }
 
+    function extractYoutubeId(value) {
+        const raw = (value || '').trim();
+        if (!raw || raw === 'NONE') return raw;
+        const patterns = [
+            /youtu\.be\/([A-Za-z0-9_-]{11})/,
+            /youtube(?:-nocookie)?\.com\/embed\/([A-Za-z0-9_-]{11})/,
+            /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+            /[?&]v=([A-Za-z0-9_-]{11})/
+        ];
+        for (const pattern of patterns) {
+            const match = raw.match(pattern);
+            if (match) return match[1];
+        }
+        return raw;
+    }
+
+    function findAudioForTitle(pageNum, titleText) {
+        const pageAudios = (audioMap[pageNum] || [])
+            .filter(aud => aud.youtubeId && aud.youtubeId !== 'NONE');
+        return pageAudios.find(aud => titlesMatch(titleText, aud.title)) || null;
+    }
+
     function updateFloatingControls(pageDiv) {
         if (!pageDiv) return;
 
-        const songTitleEl = pageDiv.querySelector('.song-title');
-        if (!songTitleEl) {
+        const songTitleEls = Array.from(pageDiv.querySelectorAll('.song-title'));
+        if (songTitleEls.length === 0) {
             floatingControls.classList.add('hidden-control');
             return;
         }
 
-        const titleText = songTitleEl.textContent.trim();
         const pageId = pageDiv.id;
         const pageNum = pageId.replace('page-', '');
+        const songsOnPage = songTitleEls.map(titleEl => {
+            const title = getSongTitleText(titleEl);
+            return {
+                title,
+                audio: findAudioForTitle(pageNum, title)
+            };
+        });
 
-        // Find if this song has an audio match
-        let songAudio = null;
-        if (audioMap[pageNum]) {
-            const pageAudios = audioMap[pageNum].filter(aud => aud.youtubeId && aud.youtubeId !== 'NONE');
-            songAudio = pageAudios.find(aud => titlesMatch(titleText, aud.title));
-            if (!songAudio && pageAudios.length === 1) {
-                songAudio = pageAudios[0];
-            }
+        if (songsOnPage.length > 1) {
+            currentSongTitle.classList.add('multi-song');
+            currentSongTitle.innerHTML = '';
+            floatingPlayBtn.style.display = 'none';
+            const list = document.createElement('div');
+            list.className = 'floating-song-list';
+            songsOnPage.forEach(song => {
+                const row = document.createElement('div');
+                row.className = 'floating-song-row';
+                const label = document.createElement('span');
+                label.className = 'floating-song-label';
+                label.textContent = song.title;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = song.audio ? 'floating-song-btn' : 'floating-song-btn search';
+                btn.textContent = song.audio ? 'Écouter' : 'Rechercher';
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (song.audio) {
+                        playAudio(song.audio.title, song.audio.youtubeId);
+                    } else {
+                        const query = encodeURIComponent(`${song.title} Choeur Montjoie OR Sapiens OR Padres`);
+                        window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+                    }
+                });
+                row.appendChild(label);
+                row.appendChild(btn);
+                list.appendChild(row);
+            });
+            currentSongTitle.appendChild(list);
+            floatingControls.classList.remove('hidden-control');
+            return;
         }
+
+        currentSongTitle.classList.remove('multi-song');
+        floatingPlayBtn.style.display = 'inline-flex';
+        const titleText = songsOnPage[0].title;
+        const songAudio = songsOnPage[0].audio;
 
         currentSongTitle.textContent = titleText;
         floatingControls.classList.remove('hidden-control');
@@ -320,27 +400,6 @@ function startCarnetApp() {
         }
     }
 
-    function setupColumnSwitcher() {
-        const colButtons = document.querySelectorAll('.col-btn');
-        colButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                colButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                const cols = btn.getAttribute('data-cols');
-                bookContainer.classList.remove('book-cols-1', 'book-cols-2', 'book-cols-3');
-                
-                if (cols === '1') {
-                    bookContainer.classList.add('book-cols-1');
-                } else if (cols === '2') {
-                    bookContainer.classList.add('book-cols-2');
-                } else if (cols === '3') {
-                    bookContainer.classList.add('book-cols-3');
-                }
-            });
-        });
-    }
-
     // --- Audio Player Logic (Modal) ---
     const modal = document.getElementById('youtube-modal');
     const modalTitle = document.getElementById('modal-title');
@@ -348,6 +407,7 @@ function startCarnetApp() {
     const closeModalBtn = document.getElementById('close-modal');
 
     window.playAudio = function(title, youtubeId) {
+        youtubeId = extractYoutubeId(youtubeId);
         modalTitle.textContent = title;
         
         // Clean up any existing external link in modal content first
