@@ -37,6 +37,10 @@ window.audio_map_data = {
   ],
   "9": [
     {
+      "title": "Écoute la prière",
+      "youtubeId": "NZ0H7JVZKy4"
+    },
+    {
       "title": "Voguons au vent de mer",
       "youtubeId": "NZ0H7JVZKy4"
     }
@@ -111,6 +115,12 @@ window.audio_map_data = {
     {
       "title": "Prière du Parachutiste",
       "youtubeId": "VoSv5MtNHfw"
+    }
+  ],
+  "24": [
+    {
+      "title": "Ô Vierge immaculée",
+      "youtubeId": "N27xJlEy_Ko"
     }
   ],
   "26": [
@@ -203,6 +213,12 @@ window.audio_map_data = {
       "youtubeId": "patj37ZYi20"
     }
   ],
+  "41": [
+    {
+      "title": "Vagabonde",
+      "youtubeId": "bzVCf9ZeHFY"
+    }
+  ],
   "42": [
     {
       "title": "Vieux pèlerin",
@@ -257,6 +273,12 @@ window.audio_map_data = {
       "youtubeId": "jf15yXYXcqc"
     }
   ],
+  "53": [
+    {
+      "title": "Chante au danger",
+      "youtubeId": "ahCm6xplC7w"
+    }
+  ],
   "54": [
     {
       "title": "Une fleur au chapeau",
@@ -271,12 +293,12 @@ window.audio_map_data = {
   ],
   "56": [
     {
-      "title": "Montjoie",
-      "youtubeId": "98all2-U1EY"
-    },
-    {
       "title": "Sur mon honneur",
       "youtubeId": "19Sy0OyXk58"
+    },
+    {
+      "title": "Montjoie",
+      "youtubeId": "98all2-U1EY"
     }
   ],
   "57": [
@@ -285,10 +307,40 @@ window.audio_map_data = {
       "youtubeId": "RkQW7MaGTmA"
     }
   ],
+  "58": [
+    {
+      "title": "Sortie d'hiver",
+      "youtubeId": "VcCV57hIy84"
+    }
+  ],
   "59": [
     {
       "title": "La marche au camp",
       "youtubeId": "NQcTgi_KprI"
+    }
+  ],
+  "60": [
+    {
+      "title": "Chantons nos montagnes",
+      "youtubeId": "NONE"
+    }
+  ],
+  "61": [
+    {
+      "title": "Le Foulard vert",
+      "youtubeId": "NONE"
+    }
+  ],
+  "62": [
+    {
+      "title": "Les cuistots",
+      "youtubeId": "xAu7XL_4Cf0"
+    }
+  ],
+  "63": [
+    {
+      "title": "Il était une charrette",
+      "youtubeId": "n1UQqAqqRXQ"
     }
   ],
   "64": [
@@ -327,6 +379,12 @@ window.audio_map_data = {
       "youtubeId": "lzCBUUz3LCA"
     }
   ],
+  "71": [
+    {
+      "title": "Et le premier c'est un marin",
+      "youtubeId": "H7KmVfaXOI8"
+    }
+  ],
   "72": [
     {
       "title": "Le Capitaine de Saint-Malo",
@@ -339,10 +397,22 @@ window.audio_map_data = {
       "youtubeId": "SrgNTZfhLy4"
     }
   ],
+  "74": [
+    {
+      "title": "Le Corsaire le grand coureur",
+      "youtubeId": "RUKD_CAtrGE"
+    }
+  ],
   "75": [
     {
       "title": "Au 31 du mois d'août",
       "youtubeId": "WYNy0GM2gu8"
+    }
+  ],
+  "76": [
+    {
+      "title": "Les trois marins de Groix",
+      "youtubeId": "d7dltKyoWrM"
     }
   ],
   "77": [
@@ -351,16 +421,46 @@ window.audio_map_data = {
       "youtubeId": "dBIO2u2zOyY"
     }
   ],
+  "78": [
+    {
+      "title": "Satanicles",
+      "youtubeId": "6z_wCwEirwA"
+    }
+  ],
+  "79": [
+    {
+      "title": "Loguivy de la mer",
+      "youtubeId": "tLEmIMDc4jY"
+    }
+  ],
+  "80": [
+    {
+      "title": "Quinze marins",
+      "youtubeId": "rY1kZNFeD5I"
+    }
+  ],
+  "81": [
+    {
+      "title": "Matelots, puisqu’il fait bon vent",
+      "youtubeId": "AbeC7wTTR3w"
+    }
+  ],
   "82": [
     {
-      "title": "La fille du coupeur de paille",
+      "title": "Santiano",
       "youtubeId": "un_xO9RWKbs"
     }
   ],
   "83": [
     {
-      "title": "Les filles de La Rochelle",
+      "title": "Ceux qu’ont nommé les bancs",
       "youtubeId": "cxvZLaPf8Fw"
+    }
+  ],
+  "84": [
+    {
+      "title": "Le Galérien",
+      "youtubeId": "SoMpHfWl2Xs"
     }
   ],
   "85": [
@@ -373,6 +473,18 @@ window.audio_map_data = {
     {
       "title": "Belle Virginie",
       "youtubeId": "Kg1xySZgGSw"
+    }
+  ],
+  "87": [
+    {
+      "title": "Il était un petit navire",
+      "youtubeId": "NONE"
+    }
+  ],
+  "88": [
+    {
+      "title": "Allez les marins",
+      "youtubeId": "L2A2joccnyk"
     }
   ],
   "89": [
@@ -405,6 +517,18 @@ window.audio_map_data = {
       "youtubeId": "4a4T14L3GTY"
     }
   ],
+  "96": [
+    {
+      "title": "La triste vie du matelot",
+      "youtubeId": "IxLY5MIRO3Y"
+    }
+  ],
+  "97": [
+    {
+      "title": "Chants de la fleur de lys",
+      "youtubeId": "NONE"
+    }
+  ],
   "98": [
     {
       "title": "Monsieur de Charette",
@@ -417,6 +541,12 @@ window.audio_map_data = {
       "youtubeId": "by-BACDq1qA"
     }
   ],
+  "100": [
+    {
+      "title": "Les gars du Berry",
+      "youtubeId": "y_bWD998924"
+    }
+  ],
   "101": [
     {
       "title": "Le petit Grégoire",
@@ -427,6 +557,12 @@ window.audio_map_data = {
     {
       "title": "Kyrie des gueux",
       "youtubeId": "PFgQ3XZg6cc"
+    }
+  ],
+  "103": [
+    {
+      "title": "La Marseillaise des Blancs",
+      "youtubeId": "NHpcCEj6rsU"
     }
   ],
   "104": [
@@ -451,6 +587,12 @@ window.audio_map_data = {
     {
       "title": "La blanche hermine",
       "youtubeId": "HUphoDbaPgQ"
+    }
+  ],
+  "108": [
+    {
+      "title": "Les mouchoirs de Cholet",
+      "youtubeId": "dMTgsWQ-qAs"
     }
   ],
   "109": [
@@ -481,6 +623,12 @@ window.audio_map_data = {
     {
       "title": "La Saint Hubert",
       "youtubeId": "kAyMvoVotzQ"
+    }
+  ],
+  "115": [
+    {
+      "title": "Claquez bannières de chrétienté",
+      "youtubeId": "98all2-U1EY"
     }
   ],
   "116": [
@@ -719,10 +867,6 @@ window.audio_map_data = {
     {
       "title": "La légende de Saint Nicolas",
       "youtubeId": "M9steij7LEM"
-    },
-    {
-      "title": "La légende de Saint Nicolas (suite)",
-      "youtubeId": "U_IEBtOEAQU"
     }
   ],
   "156": [
@@ -881,6 +1025,12 @@ window.audio_map_data = {
       "youtubeId": "3FymJcIhjxE"
     }
   ],
+  "184": [
+    {
+      "title": "Etre et durer",
+      "youtubeId": "5J9Fqu5Sv3g"
+    }
+  ],
   "185": [
     {
       "title": "Chant du 2ème REP",
@@ -1031,6 +1181,12 @@ window.audio_map_data = {
       "youtubeId": "wTaWiu9XDbg"
     }
   ],
+  "213": [
+    {
+      "title": "Singing aye !",
+      "youtubeId": "NONE"
+    }
+  ],
   "214": [
     {
       "title": "Se canto (Devant ma fenêtre)",
@@ -1123,9 +1279,9 @@ window.audio_map_data = {
       "youtubeId": "hVXtim3hhho"
     }
   ],
-  "231": [
+  "230": [
     {
-      "title": "Table des matières",
+      "title": "Canons de veillée",
       "youtubeId": "NONE"
     }
   ]
