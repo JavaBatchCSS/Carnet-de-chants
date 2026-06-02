@@ -336,15 +336,112 @@ function startCarnetApp() {
         return `https://music.youtube.com/watch?v=${extractYoutubeId(youtubeId)}`;
     }
 
-    function getYoutubeEmbedUrl(youtubeId) {
-        const id = extractYoutubeId(youtubeId);
-        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&controls=1&modestbranding=1&rel=0&playsinline=1&fs=0`;
+    let youtubeApiPromise = null;
+    let currentYoutubePlayer = null;
+
+    function ensureYoutubeIframeApi() {
+        if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+        if (youtubeApiPromise) return youtubeApiPromise;
+
+        youtubeApiPromise = new Promise((resolve, reject) => {
+            const previousReady = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = () => {
+                if (typeof previousReady === 'function') previousReady();
+                resolve(window.YT);
+            };
+
+            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+                const script = document.createElement('script');
+                script.src = 'https://www.youtube.com/iframe_api';
+                script.async = true;
+                script.onerror = () => reject(new Error('API YouTube indisponible'));
+                document.head.appendChild(script);
+            }
+        });
+
+        return youtubeApiPromise;
+    }
+
+    function destroyYoutubePlayer() {
+        if (currentYoutubePlayer && typeof currentYoutubePlayer.destroy === 'function') {
+            currentYoutubePlayer.destroy();
+        }
+        currentYoutubePlayer = null;
+    }
+
+    function updateYoutubeControlState(button, status, stateLabel, isPlaying) {
+        button.disabled = false;
+        button.textContent = isPlaying ? 'Pause' : 'Lecture';
+        button.title = isPlaying ? 'Mettre en pause' : 'Reprendre la lecture';
+        if (status) status.textContent = stateLabel;
     }
 
     function clearFloatingAudioPanel() {
         if (!floatingAudioPanel) return;
+        destroyYoutubePlayer();
         floatingAudioPanel.innerHTML = '';
         floatingAudioPanel.classList.add('hidden');
+    }
+
+    function createHiddenYoutubePlayer(youtubeId, host, playPauseButton, stopButton, status) {
+        destroyYoutubePlayer();
+
+        const playerId = `youtube-hidden-player-${Date.now()}`;
+        const playerMount = document.createElement('div');
+        playerMount.id = playerId;
+        host.innerHTML = '';
+        host.appendChild(playerMount);
+
+        playPauseButton.disabled = true;
+        stopButton.disabled = true;
+        if (status) status.textContent = 'Chargement YouTube...';
+
+        ensureYoutubeIframeApi()
+            .then((YT) => {
+                currentYoutubePlayer = new YT.Player(playerId, {
+                    width: '200',
+                    height: '120',
+                    videoId: youtubeId,
+                    playerVars: {
+                        autoplay: 1,
+                        controls: 0,
+                        disablekb: 0,
+                        enablejsapi: 1,
+                        fs: 0,
+                        iv_load_policy: 3,
+                        modestbranding: 1,
+                        playsinline: 1,
+                        rel: 0
+                    },
+                    events: {
+                        onReady: (event) => {
+                            stopButton.disabled = false;
+                            updateYoutubeControlState(playPauseButton, status, 'Lecture YouTube', true);
+                            event.target.playVideo();
+                        },
+                        onStateChange: (event) => {
+                            if (!window.YT || !window.YT.PlayerState) return;
+                            if (event.data === window.YT.PlayerState.PLAYING) {
+                                updateYoutubeControlState(playPauseButton, status, 'Lecture YouTube', true);
+                            } else if (event.data === window.YT.PlayerState.PAUSED) {
+                                updateYoutubeControlState(playPauseButton, status, 'En pause', false);
+                            } else if (event.data === window.YT.PlayerState.ENDED) {
+                                updateYoutubeControlState(playPauseButton, status, 'Terminé', false);
+                            }
+                        },
+                        onError: () => {
+                            playPauseButton.disabled = true;
+                            stopButton.disabled = true;
+                            if (status) status.textContent = 'Lecture intégrée indisponible';
+                        }
+                    }
+                });
+            })
+            .catch(() => {
+                playPauseButton.disabled = true;
+                stopButton.disabled = true;
+                if (status) status.textContent = 'API YouTube indisponible';
+            });
     }
 
     function updateFloatingControls(pageDiv) {
@@ -490,19 +587,51 @@ function startCarnetApp() {
         const controlStrip = document.createElement('div');
         controlStrip.className = 'youtube-control-strip';
 
-        const player = document.createElement('iframe');
-        player.className = 'youtube-control-iframe';
-        player.src = getYoutubeEmbedUrl(youtubeId);
-        player.title = title;
-        player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-        player.referrerPolicy = 'strict-origin-when-cross-origin';
-        controlStrip.appendChild(player);
+        const playPauseButton = document.createElement('button');
+        playPauseButton.type = 'button';
+        playPauseButton.className = 'youtube-control-btn primary';
+        playPauseButton.textContent = 'Lecture';
+
+        const stopButton = document.createElement('button');
+        stopButton.type = 'button';
+        stopButton.className = 'youtube-control-btn';
+        stopButton.textContent = 'Stop';
+
+        const status = document.createElement('span');
+        status.className = 'youtube-control-status';
+        status.textContent = 'YouTube';
+
+        const hiddenPlayerHost = document.createElement('div');
+        hiddenPlayerHost.className = 'youtube-hidden-player-host';
+
+        playPauseButton.addEventListener('click', () => {
+            if (!currentYoutubePlayer || !window.YT || !window.YT.PlayerState) return;
+            const state = currentYoutubePlayer.getPlayerState();
+            if (state === window.YT.PlayerState.PLAYING) {
+                currentYoutubePlayer.pauseVideo();
+            } else {
+                currentYoutubePlayer.playVideo();
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            if (!currentYoutubePlayer) return;
+            currentYoutubePlayer.stopVideo();
+            updateYoutubeControlState(playPauseButton, status, 'Arrêté', false);
+        });
+
+        controlStrip.appendChild(playPauseButton);
+        controlStrip.appendChild(stopButton);
+        controlStrip.appendChild(status);
+        controlStrip.appendChild(hiddenPlayerHost);
 
         floatingAudioPanel.innerHTML = '';
         floatingAudioPanel.appendChild(summary);
         floatingAudioPanel.appendChild(controlStrip);
         floatingAudioPanel.classList.remove('hidden');
         floatingControls.classList.remove('hidden-control');
+
+        createHiddenYoutubePlayer(youtubeId, hiddenPlayerHost, playPauseButton, stopButton, status);
     };
 
 }

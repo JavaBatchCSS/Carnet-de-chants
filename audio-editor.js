@@ -1,7 +1,7 @@
 // audio-editor.js
 // Éditeur complet : charge songs-index + audio-map, fusionne, permet recherche via API Piped et édition
 
-const DEFAULT_GITHUB_AUDIO_MAP_PATH = 'app/public/audio-map.js';
+const DEFAULT_GITHUB_AUDIO_MAP_PATH = 'public/audio-map.js';
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -94,7 +94,7 @@ function normalizeGithubAudioMapPath(path) {
     .trim()
     .replace(/\\/g, '/')
     .replace(/^\/+/, '');
-  return normalized === 'public/audio-map.js' ? DEFAULT_GITHUB_AUDIO_MAP_PATH : normalized;
+  return normalized === 'app/public/audio-map.js' ? DEFAULT_GITHUB_AUDIO_MAP_PATH : normalized;
 }
 
 async function loadData() {
