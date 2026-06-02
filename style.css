@@ -787,16 +787,22 @@ body {
 }
 
 .floating-audio-panel {
-    display: grid;
-    grid-template-columns: 86px minmax(0, 1fr);
-    gap: 10px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     border-top: 1px solid rgba(24, 48, 89, 0.12);
     padding-top: 8px;
 }
 
 .floating-audio-panel.hidden {
     display: none;
+}
+
+.floating-audio-summary {
+    display: grid;
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
 }
 
 .floating-audio-thumb-link {
@@ -863,6 +869,26 @@ body {
 
 .floating-audio-link:hover {
     opacity: 0.88;
+}
+
+.youtube-control-strip {
+    position: relative;
+    width: 100%;
+    height: 58px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #000;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.youtube-control-iframe {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 190px;
+    border: 0;
+    background: #000;
 }
 
 .control-btn-play {

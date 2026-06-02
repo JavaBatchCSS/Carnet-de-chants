@@ -336,6 +336,11 @@ function startCarnetApp() {
         return `https://music.youtube.com/watch?v=${extractYoutubeId(youtubeId)}`;
     }
 
+    function getYoutubeEmbedUrl(youtubeId) {
+        const id = extractYoutubeId(youtubeId);
+        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&controls=1&modestbranding=1&rel=0&playsinline=1&fs=0`;
+    }
+
     function clearFloatingAudioPanel() {
         if (!floatingAudioPanel) return;
         floatingAudioPanel.innerHTML = '';
@@ -427,6 +432,9 @@ function startCarnetApp() {
         youtubeId = extractYoutubeId(youtubeId);
         if (!youtubeId || youtubeId === 'NONE' || !floatingAudioPanel) return;
 
+        const summary = document.createElement('div');
+        summary.className = 'floating-audio-summary';
+
         const thumbnailLink = document.createElement('a');
         thumbnailLink.className = 'floating-audio-thumb-link';
         thumbnailLink.href = getYoutubeMusicUrl(youtubeId);
@@ -476,10 +484,23 @@ function startCarnetApp() {
         actions.appendChild(youtubeLink);
         meta.appendChild(panelTitle);
         meta.appendChild(actions);
+        summary.appendChild(thumbnailLink);
+        summary.appendChild(meta);
+
+        const controlStrip = document.createElement('div');
+        controlStrip.className = 'youtube-control-strip';
+
+        const player = document.createElement('iframe');
+        player.className = 'youtube-control-iframe';
+        player.src = getYoutubeEmbedUrl(youtubeId);
+        player.title = title;
+        player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        player.referrerPolicy = 'strict-origin-when-cross-origin';
+        controlStrip.appendChild(player);
 
         floatingAudioPanel.innerHTML = '';
-        floatingAudioPanel.appendChild(thumbnailLink);
-        floatingAudioPanel.appendChild(meta);
+        floatingAudioPanel.appendChild(summary);
+        floatingAudioPanel.appendChild(controlStrip);
         floatingAudioPanel.classList.remove('hidden');
         floatingControls.classList.remove('hidden-control');
     };
