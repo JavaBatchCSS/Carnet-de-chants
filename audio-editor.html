@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     <div class="config-item">
-                        <label for="cfg-gh-repo">🐙 Dépôt GitHub <span class="optional">(optionnel — fallback téléchargement si vide)</span></label>
+                        <label for="cfg-gh-repo">🐙 Dépôt GitHub <span class="optional">(requis pour enregistrer)</span></label>
                         <input type="text" id="cfg-gh-repo" placeholder="proprietaire/depot" class="config-input">
                     </div>
                     <div class="config-item">
@@ -39,7 +39,7 @@
                     </div>
                     <div class="config-item">
                         <label for="cfg-gh-path">📁 Chemin du fichier dans le dépôt</label>
-                        <input type="text" id="cfg-gh-path" value="public/audio-map.js" class="config-input">
+                        <input type="text" id="cfg-gh-path" value="app/public/audio-map.js" class="config-input">
                     </div>
                 </div>
                 <div style="margin-top: 1rem; display: flex; gap: .5rem; align-items: center;">
@@ -74,7 +74,7 @@
                         <th class="col-cover">Couverture</th>
                         <th class="col-title">Titre</th>
                         <th class="col-status">Statut</th>
-                        <th class="col-action">Action</th>
+                        <th class="col-action">Action (ID ou URL YouTube)</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -86,10 +86,9 @@
             
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <button id="export-github" class="primary-btn" style="background: linear-gradient(135deg, #10b981, #059669);">🚀 Pousser sur GitHub</button>
-                <button id="export-json" class="secondary-btn">💾 Télécharger (Secours)</button>
             </div>
             <p id="export-status" style="margin-top: 1rem; font-weight: 600;"></p>
-            <p class="export-help">Le fichier remplace <code>public/audio-map.js</code></p>
+            <p class="export-help">Le fichier remplace <code>app/public/audio-map.js</code></p>
         </section>
     </main>
     <script src="audio-editor.js"></script>

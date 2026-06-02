@@ -241,6 +241,7 @@ function startCarnetApp() {
     const floatingControls = document.getElementById('floating-controls');
     const currentSongTitle = document.getElementById('current-song-title');
     const floatingPlayBtn = document.getElementById('floating-play-btn');
+    const floatingAudioPanel = document.getElementById('floating-audio-panel');
 
     function setupFloatingControlsObserver() {
         const observerOptions = {
@@ -321,8 +322,29 @@ function startCarnetApp() {
         return pageAudios.find(aud => titlesMatch(titleText, aud.title)) || null;
     }
 
+    function getYoutubeThumbnailUrl(youtubeId, quality = 'hqdefault') {
+        const id = extractYoutubeId(youtubeId);
+        if (!id || id === 'NONE') return '';
+        return `https://img.youtube.com/vi/${id}/${quality}.jpg`;
+    }
+
+    function getYoutubeWatchUrl(youtubeId) {
+        return `https://www.youtube.com/watch?v=${extractYoutubeId(youtubeId)}`;
+    }
+
+    function getYoutubeMusicUrl(youtubeId) {
+        return `https://music.youtube.com/watch?v=${extractYoutubeId(youtubeId)}`;
+    }
+
+    function clearFloatingAudioPanel() {
+        if (!floatingAudioPanel) return;
+        floatingAudioPanel.innerHTML = '';
+        floatingAudioPanel.classList.add('hidden');
+    }
+
     function updateFloatingControls(pageDiv) {
         if (!pageDiv) return;
+        clearFloatingAudioPanel();
 
         const songTitleEls = Array.from(pageDiv.querySelectorAll('.song-title'));
         if (songTitleEls.length === 0) {
@@ -400,106 +422,67 @@ function startCarnetApp() {
         }
     }
 
-    // --- Audio Player Logic (Modal) ---
-    const modal = document.getElementById('youtube-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const iframeContainer = document.getElementById('youtube-iframe-container');
-    const closeModalBtn = document.getElementById('close-modal');
-
+    // --- Audio link panel logic (no embedded video in the carnet) ---
     window.playAudio = function(title, youtubeId) {
         youtubeId = extractYoutubeId(youtubeId);
-        modalTitle.textContent = title;
-        
-        // Clean up any existing external link in modal content first
-        const existingLink = modal.querySelector('.modal-external-link');
-        if (existingLink) {
-            existingLink.remove();
-        }
+        if (!youtubeId || youtubeId === 'NONE' || !floatingAudioPanel) return;
 
-        if (window.location.protocol === 'file:') {
-            // Local execution warning for YouTube embedding (Error 153)
-            iframeContainer.innerHTML = `
-                <div class="local-warning-container" style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100%;
-                    padding: 30px;
-                    background: linear-gradient(135deg, #1e293b, #0f172a);
-                    color: #f8fafc;
-                    text-align: center;
-                    border-radius: 8px;
-                    box-sizing: border-box;
-                ">
-                    <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-                    <h3 style="font-family: var(--font-title); font-size: 20px; margin-bottom: 10px; color: #f1f5f9;">Lecture locale bloquée (Erreur 153)</h3>
-                    <p style="font-size: 14px; line-height: 1.5; color: #cbd5e1; max-width: 400px; margin-bottom: 25px;">
-                        YouTube n'autorise pas la lecture de cette vidéo intégrée en mode hors-ligne local (protocole <code>file://</code>).
-                    </p>
-                    <a href="https://www.youtube.com/watch?v=${youtubeId}" target="_blank" class="local-redirect-btn" style="
-                        background: linear-gradient(135deg, #e11d48, #be123c);
-                        color: white;
-                        text-decoration: none;
-                        padding: 12px 24px;
-                        border-radius: 25px;
-                        font-weight: bold;
-                        font-size: 15px;
-                        box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
-                        transition: all 0.2s ease;
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(225, 29, 72, 0.6)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(225, 29, 72, 0.4)';">
-                        Regarder sur YouTube ↗
-                    </a>
-                </div>
-            `;
-        } else {
-            iframeContainer.innerHTML = `
-                <iframe 
-                    width="100%" 
-                    height="100%" 
-                    src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1" 
-                    title="${title}" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
-            `;
+        const thumbnailLink = document.createElement('a');
+        thumbnailLink.className = 'floating-audio-thumb-link';
+        thumbnailLink.href = getYoutubeMusicUrl(youtubeId);
+        thumbnailLink.target = '_blank';
+        thumbnailLink.rel = 'noopener';
+        thumbnailLink.title = 'Le chant sur YouTube Music';
 
-            // Add external link as a fallback
-            const extLink = document.createElement('a');
-            extLink.className = 'modal-external-link';
-            extLink.href = `https://www.youtube.com/watch?v=${youtubeId}`;
-            extLink.target = '_blank';
-            extLink.textContent = 'Ouvrir sur YouTube ↗';
-            extLink.style.cssText = `
-                display: block;
-                text-align: center;
-                margin-top: 15px;
-                font-size: 13.5px;
-                color: var(--accent-color);
-                text-decoration: none;
-                font-weight: bold;
-            `;
-            extLink.onmouseover = () => extLink.style.textDecoration = 'underline';
-            extLink.onmouseout = () => extLink.style.textDecoration = 'none';
-            iframeContainer.parentNode.appendChild(extLink);
-        }
-        modal.classList.remove('hidden');
+        const thumbnail = document.createElement('img');
+        thumbnail.className = 'floating-audio-thumb';
+        thumbnail.src = getYoutubeThumbnailUrl(youtubeId);
+        thumbnail.alt = `Miniature ${title}`;
+        thumbnail.loading = 'lazy';
+        thumbnail.decoding = 'async';
+        thumbnail.onerror = () => {
+            thumbnail.onerror = null;
+            thumbnail.src = getYoutubeThumbnailUrl(youtubeId, 'mqdefault');
+        };
+        thumbnailLink.appendChild(thumbnail);
+
+        const meta = document.createElement('div');
+        meta.className = 'floating-audio-meta';
+
+        const panelTitle = document.createElement('div');
+        panelTitle.className = 'floating-audio-title';
+        panelTitle.textContent = title;
+
+        const actions = document.createElement('div');
+        actions.className = 'floating-audio-actions';
+
+        const musicLink = document.createElement('a');
+        musicLink.className = 'floating-audio-link primary';
+        musicLink.href = getYoutubeMusicUrl(youtubeId);
+        musicLink.target = '_blank';
+        musicLink.rel = 'noopener';
+        musicLink.textContent = 'YouTube Music';
+        musicLink.title = 'Le chant sur YouTube Music';
+
+        const youtubeLink = document.createElement('a');
+        youtubeLink.className = 'floating-audio-link';
+        youtubeLink.href = getYoutubeWatchUrl(youtubeId);
+        youtubeLink.target = '_blank';
+        youtubeLink.rel = 'noopener';
+        youtubeLink.textContent = 'YouTube';
+        youtubeLink.title = 'Ouvrir le chant sur YouTube';
+
+        actions.appendChild(musicLink);
+        actions.appendChild(youtubeLink);
+        meta.appendChild(panelTitle);
+        meta.appendChild(actions);
+
+        floatingAudioPanel.innerHTML = '';
+        floatingAudioPanel.appendChild(thumbnailLink);
+        floatingAudioPanel.appendChild(meta);
+        floatingAudioPanel.classList.remove('hidden');
+        floatingControls.classList.remove('hidden-control');
     };
-
-    function cleanUpModal() {
-        iframeContainer.innerHTML = '';
-        const existingLink = modal.querySelector('.modal-external-link');
-        if (existingLink) {
-            existingLink.remove();
-        }
-        modal.classList.add('hidden');
-    }
-
-    closeModalBtn.addEventListener('click', cleanUpModal);
 
 }
 

@@ -1,6 +1,8 @@
 // audio-editor.js
 // Éditeur complet : charge songs-index + audio-map, fusionne, permet recherche via API Piped et édition
 
+const DEFAULT_GITHUB_AUDIO_MAP_PATH = 'app/public/audio-map.js';
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[data-source="${src}"]`);
@@ -85,6 +87,14 @@ function markModified() {
   modified = true;
   const indicator = document.getElementById('save-indicator');
   if (indicator) indicator.classList.add('visible');
+}
+
+function normalizeGithubAudioMapPath(path) {
+  const normalized = (path || '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '');
+  return normalized === 'public/audio-map.js' ? DEFAULT_GITHUB_AUDIO_MAP_PATH : normalized;
 }
 
 async function loadData() {
@@ -250,6 +260,17 @@ function createRow(song, index, songsOnPage) {
   previewBtn.className = 'icon-btn preview-btn';
   previewBtn.addEventListener('click', () => togglePreview(tr, song));
 
+  const urlBtn = document.createElement('button');
+  urlBtn.innerHTML = '🔗';
+  urlBtn.title = 'Coller une URL YouTube';
+  urlBtn.className = 'icon-btn url-btn';
+  urlBtn.addEventListener('click', () => {
+    const value = prompt('Collez l’URL YouTube ou l’ID vidéo :', song.youtubeId && song.youtubeId !== 'NONE' ? song.youtubeId : '');
+    if (value === null) return;
+    song.youtubeId = extractYoutubeId(value);
+    updateRowState();
+  });
+
   const ignoreBtn = document.createElement('button');
   ignoreBtn.innerHTML = '🗑️';
   ignoreBtn.title = 'Ignorer ce chant (ne pas l\'afficher dans l\'app)';
@@ -260,6 +281,7 @@ function createRow(song, index, songsOnPage) {
   });
 
   inputWrap.appendChild(input);
+  inputWrap.appendChild(urlBtn);
   inputWrap.appendChild(searchBtn);
   inputWrap.appendChild(previewBtn);
   inputWrap.appendChild(ignoreBtn);
@@ -282,7 +304,11 @@ function getConfig(key, fallback = '') {
   if (key === 'yt_key' && !localStorage.getItem('chants_cfg_yt_key')) {
     return 'AIzaSyBTgbSPahw5Ck2pJDXx4KuDbB4H9kTP1IE';
   }
-  return localStorage.getItem('chants_cfg_' + key) || fallback;
+  const stored = localStorage.getItem('chants_cfg_' + key);
+  if (key === 'gh_path') {
+    return normalizeGithubAudioMapPath(stored || fallback || DEFAULT_GITHUB_AUDIO_MAP_PATH);
+  }
+  return stored || fallback;
 }
 
 // ── Initialisation de l'interface de configuration ──
@@ -307,7 +333,14 @@ function getConfig(key, fallback = '') {
   document.getElementById('save-config')?.addEventListener('click', () => {
     Object.entries(fields).forEach(([elId, storageKey]) => {
       const el = document.getElementById(elId);
-      if (el) localStorage.setItem('chants_cfg_' + storageKey, el.value.trim());
+      if (el) {
+        let value = el.value.trim();
+        if (storageKey === 'gh_path') {
+          value = normalizeGithubAudioMapPath(value || DEFAULT_GITHUB_AUDIO_MAP_PATH);
+          el.value = value;
+        }
+        localStorage.setItem('chants_cfg_' + storageKey, value);
+      }
     });
     const st = document.getElementById('config-status');
     if (st) { st.textContent = '✅ Configuration sauvegardée !'; st.style.color = '#4ade80'; }
@@ -690,36 +723,19 @@ function generateContent() {
   return `window.audio_map_data = ${JSON.stringify(audioMap, null, 2)};\n`;
 }
 
-function exportAudioMap() {
-  const content = generateContent();
-  const blob = new Blob([content], { type: 'text/javascript' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'audio-map.js';
-  a.click();
-  URL.revokeObjectURL(url);
-  
-  modified = false;
-  document.getElementById('save-indicator').classList.remove('visible');
-  document.getElementById('export-status').textContent = 'Fichier téléchargé ! Remplacez manuellement public/audio-map.js.';
-  document.getElementById('export-status').style.color = '#38bdf8';
-}
-
 async function pushToGithub() {
   const repo = getConfig('gh_repo');
   const token = getConfig('gh_token');
-  const path = getConfig('gh_path', 'public/audio-map.js');
+  const path = getConfig('gh_path', DEFAULT_GITHUB_AUDIO_MAP_PATH);
   const statusEl = document.getElementById('export-status');
 
   if (!repo || !token || !path) {
-    statusEl.textContent = '❌ Configuration GitHub incomplète (remplir la section 🔑 en haut). Téléchargement local…';
+    statusEl.textContent = '❌ Configuration GitHub incomplète (remplir la section 🔑 en haut). Aucune sauvegarde locale n’a été créée.';
     statusEl.style.color = '#f87171';
-    exportAudioMap();
     return;
   }
 
-  statusEl.textContent = '⏳ Récupération du fichier depuis GitHub...';
+  statusEl.textContent = `⏳ Récupération de ${path} depuis GitHub...`;
   statusEl.style.color = '#fbbf24';
 
   const content = generateContent();
@@ -747,6 +763,12 @@ async function pushToGithub() {
     // Encodage base64 utf-8 supportant les accents
     const base64Content = btoa(unescape(encodeURIComponent(content)));
 
+    const body = {
+      message: 'Mise à jour des chants audio (via éditeur web)',
+      content: base64Content
+    };
+    if (sha) body.sha = sha;
+
     const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
       method: 'PUT',
       headers: {
@@ -754,11 +776,7 @@ async function pushToGithub() {
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        message: 'Mise à jour des chants audio (via éditeur web)',
-        content: base64Content,
-        sha: sha // optionnel si 404 (nouveau fichier)
-      })
+      body: JSON.stringify(body)
     });
 
     if (!putRes.ok) {
@@ -766,16 +784,15 @@ async function pushToGithub() {
       throw new Error(err.message || putRes.status);
     }
 
-    statusEl.textContent = '✅ Fichier mis à jour avec succès sur GitHub !';
+    statusEl.textContent = `✅ ${path} mis à jour avec succès sur GitHub !`;
     statusEl.style.color = '#4ade80';
     modified = false;
     document.getElementById('save-indicator').classList.remove('visible');
 
   } catch (error) {
     console.error("Erreur GitHub:", error);
-    statusEl.textContent = `❌ Échec de la mise à jour GitHub: ${error.message}. Téléchargement local en cours...`;
+    statusEl.textContent = `❌ Échec de la mise à jour GitHub: ${error.message}. Aucune sauvegarde locale n’a été créée.`;
     statusEl.style.color = '#f87171';
-    exportAudioMap();
   }
 }
 
@@ -797,9 +814,6 @@ document.getElementById('load-audio-map').addEventListener('click', async () => 
     document.getElementById('load-status').textContent = 'Erreur : ' + err.message;
   }
 });
-
-const exportBtn = document.getElementById('export-json');
-if(exportBtn) exportBtn.addEventListener('click', exportAudioMap);
 
 const exportGhBtn = document.getElementById('export-github');
 if(exportGhBtn) exportGhBtn.addEventListener('click', pushToGithub);

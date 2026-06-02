@@ -71,19 +71,6 @@
         </header>
     </div>
 
-    
-
-    
-
-    <!-- Modal pour afficher la vidéo YouTube -->
-    <div id="youtube-modal" class="youtube-modal hidden">
-        <div class="modal-content">
-            <span id="close-modal" class="close-modal">&times;</span>
-            <div id="modal-title" class="modal-title">Titre du chant</div>
-            <div id="youtube-iframe-container" class="youtube-iframe-container"></div>
-        </div>
-    </div>
-
     <!-- Conteneur principal (scroll-snapping) -->
     <main id="book-container" class="book-container">
         <!-- Le sommaire et les pages seront injectés ici par app.js -->
@@ -100,9 +87,8 @@
                 <span>▶</span> Écouter
             </button>
         </div>
+        <div id="floating-audio-panel" class="floating-audio-panel hidden"></div>
     </div>
-
-    <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
       (function loadFreshAppScripts(){

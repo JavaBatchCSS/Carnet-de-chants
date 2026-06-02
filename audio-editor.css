@@ -76,6 +76,7 @@ button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 }
 .icon-btn:hover { background: #475569; }
 .ignore-btn:hover { background: #94a3b8; color: #0f172a; }
+.url-btn:hover { background: #0ea5e9; color: #fff; }
 
 .load-section { text-align: center; padding: 2rem 0; }
 .load-status { color: #94a3b8; margin-top: .5rem; font-size: .9rem; }
