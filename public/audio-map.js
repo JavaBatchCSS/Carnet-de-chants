@@ -35,6 +35,12 @@ window.audio_map_data = {
       "youtubeId": "prqOrcS7yu4"
     }
   ],
+  "8": [
+    {
+      "title": "Ô Jésus, reste avec nous !",
+      "youtubeId": "NONE"
+    }
+  ],
   "9": [
     {
       "title": "Écoute la prière",
@@ -93,10 +99,22 @@ window.audio_map_data = {
       "youtubeId": "V_Jixpt0jqk"
     }
   ],
+  "18": [
+    {
+      "title": "Notre-Dame de la Paix",
+      "youtubeId": "NONE"
+    }
+  ],
   "19": [
     {
       "title": "Vierge des chemins de France",
       "youtubeId": "fMQKV1OiB7M"
+    }
+  ],
+  "20": [
+    {
+      "title": "Pour être généreux",
+      "youtubeId": "NONE"
     }
   ],
   "21": [
@@ -231,6 +249,12 @@ window.audio_map_data = {
       "youtubeId": "-M5ASKCAmzk"
     }
   ],
+  "44": [
+    {
+      "title": "Le Chat noir",
+      "youtubeId": "wlWoz_XHNGg"
+    }
+  ],
   "45": [
     {
       "title": "Sur les monts",
@@ -247,6 +271,12 @@ window.audio_map_data = {
     {
       "title": "Au camp",
       "youtubeId": "nG37mgA6xCY"
+    }
+  ],
+  "48": [
+    {
+      "title": "On n'en finira donc jamais",
+      "youtubeId": "NONE"
     }
   ],
   "49": [
@@ -493,6 +523,18 @@ window.audio_map_data = {
       "youtubeId": "IpBnNK_eVmg"
     }
   ],
+  "90": [
+    {
+      "title": "Cruelle berceuse",
+      "youtubeId": "NONE"
+    }
+  ],
+  "91": [
+    {
+      "title": "Les cannibales",
+      "youtubeId": "NONE"
+    }
+  ],
   "92": [
     {
       "title": "Brave marin",
@@ -729,6 +771,12 @@ window.audio_map_data = {
     {
       "title": "Le soldat belge",
       "youtubeId": "ngv0qAcfpds"
+    }
+  ],
+  "132": [
+    {
+      "title": "Pour Dieu et ma Patrie",
+      "youtubeId": "NONE"
     }
   ],
   "133": [
@@ -1193,6 +1241,12 @@ window.audio_map_data = {
       "youtubeId": "f26jp_WZGjA"
     }
   ],
+  "215": [
+    {
+      "title": "La choupe aux choux",
+      "youtubeId": "NONE"
+    }
+  ],
   "216": [
     {
       "title": "Les crocodiles",
@@ -1203,6 +1257,12 @@ window.audio_map_data = {
     {
       "title": "Cantique des étoiles",
       "youtubeId": "TAeu5SeUexg"
+    }
+  ],
+  "218": [
+    {
+      "title": "Ma Guadeloupe",
+      "youtubeId": "NONE"
     }
   ],
   "219": [
