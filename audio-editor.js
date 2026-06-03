@@ -94,7 +94,7 @@ function normalizeGithubAudioMapPath(path) {
     .trim()
     .replace(/\\/g, '/')
     .replace(/^\/+/, '');
-  return normalized === 'app/public/audio-map.js' ? DEFAULT_GITHUB_AUDIO_MAP_PATH : normalized;
+  return normalized === 'public/audio-map.js' ? DEFAULT_GITHUB_AUDIO_MAP_PATH : normalized;
 }
 
 async function loadData() {
