@@ -338,6 +338,9 @@ function startCarnetApp() {
 
     let youtubeApiPromise = null;
     let currentYoutubePlayer = null;
+    let youtubeProgressTimer = null;
+    let isYoutubeSeeking = false;
+    let currentPlayerUi = null;
 
     function ensureYoutubeIframeApi() {
         if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
@@ -363,28 +366,60 @@ function startCarnetApp() {
     }
 
     function destroyYoutubePlayer() {
+        stopYoutubeProgressTimer();
         if (currentYoutubePlayer && typeof currentYoutubePlayer.destroy === 'function') {
             currentYoutubePlayer.destroy();
         }
         currentYoutubePlayer = null;
+        currentPlayerUi = null;
     }
 
     function updateYoutubeControlState(button, status, stateLabel, isPlaying) {
         button.disabled = false;
-        button.textContent = isPlaying ? 'Pause' : 'Lecture';
+        button.textContent = isPlaying ? '⏸' : '▶';
+        button.setAttribute('aria-label', isPlaying ? 'Mettre en pause' : 'Reprendre la lecture');
         button.title = isPlaying ? 'Mettre en pause' : 'Reprendre la lecture';
         if (status) status.textContent = stateLabel;
     }
 
-    function clearFloatingAudioPanel() {
-        if (!floatingAudioPanel) return;
-        destroyYoutubePlayer();
-        floatingAudioPanel.innerHTML = '';
-        floatingAudioPanel.classList.add('hidden');
+    function stopYoutubeProgressTimer() {
+        if (youtubeProgressTimer) {
+            clearInterval(youtubeProgressTimer);
+            youtubeProgressTimer = null;
+        }
     }
 
-    function createHiddenYoutubePlayer(youtubeId, host, playPauseButton, stopButton, status) {
+    function formatYoutubeTime(value) {
+        const seconds = Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+        const mins = Math.floor(seconds / 60);
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${mins}:${secs}`;
+    }
+
+    function updateYoutubeTimeline() {
+        if (!currentYoutubePlayer || !currentPlayerUi || isYoutubeSeeking) return;
+        if (typeof currentYoutubePlayer.getCurrentTime !== 'function' || typeof currentYoutubePlayer.getDuration !== 'function') return;
+
+        const duration = currentYoutubePlayer.getDuration() || 0;
+        const currentTime = currentYoutubePlayer.getCurrentTime() || 0;
+        const { timeline, currentTimeEl, durationEl } = currentPlayerUi;
+
+        timeline.disabled = duration <= 0;
+        timeline.max = duration > 0 ? String(Math.floor(duration)) : '0';
+        timeline.value = duration > 0 ? String(Math.min(Math.floor(currentTime), Math.floor(duration))) : '0';
+        currentTimeEl.textContent = formatYoutubeTime(currentTime);
+        durationEl.textContent = duration > 0 ? formatYoutubeTime(duration) : '--:--';
+    }
+
+    function startYoutubeProgressTimer() {
+        stopYoutubeProgressTimer();
+        updateYoutubeTimeline();
+        youtubeProgressTimer = setInterval(updateYoutubeTimeline, 500);
+    }
+
+    function createHiddenYoutubePlayer(youtubeId, host, playPauseButton, stopButton, status, timelineUi) {
         destroyYoutubePlayer();
+        currentPlayerUi = timelineUi;
 
         const playerId = `youtube-hidden-player-${Date.now()}`;
         const playerMount = document.createElement('div');
@@ -394,6 +429,7 @@ function startCarnetApp() {
 
         playPauseButton.disabled = true;
         stopButton.disabled = true;
+        if (currentPlayerUi?.skipAdButton) currentPlayerUi.skipAdButton.disabled = true;
         if (status) status.textContent = 'Chargement YouTube...';
 
         ensureYoutubeIframeApi()
@@ -416,22 +452,28 @@ function startCarnetApp() {
                     events: {
                         onReady: (event) => {
                             stopButton.disabled = false;
+                            if (currentPlayerUi?.skipAdButton) currentPlayerUi.skipAdButton.disabled = false;
                             updateYoutubeControlState(playPauseButton, status, 'Lecture YouTube', true);
                             event.target.playVideo();
+                            startYoutubeProgressTimer();
                         },
                         onStateChange: (event) => {
                             if (!window.YT || !window.YT.PlayerState) return;
                             if (event.data === window.YT.PlayerState.PLAYING) {
                                 updateYoutubeControlState(playPauseButton, status, 'Lecture YouTube', true);
+                                startYoutubeProgressTimer();
                             } else if (event.data === window.YT.PlayerState.PAUSED) {
                                 updateYoutubeControlState(playPauseButton, status, 'En pause', false);
                             } else if (event.data === window.YT.PlayerState.ENDED) {
                                 updateYoutubeControlState(playPauseButton, status, 'Terminé', false);
+                                stopYoutubeProgressTimer();
+                                updateYoutubeTimeline();
                             }
                         },
                         onError: () => {
                             playPauseButton.disabled = true;
                             stopButton.disabled = true;
+                            if (currentPlayerUi?.skipAdButton) currentPlayerUi.skipAdButton.disabled = true;
                             if (status) status.textContent = 'Lecture intégrée indisponible';
                         }
                     }
@@ -440,17 +482,21 @@ function startCarnetApp() {
             .catch(() => {
                 playPauseButton.disabled = true;
                 stopButton.disabled = true;
+                if (currentPlayerUi?.skipAdButton) currentPlayerUi.skipAdButton.disabled = true;
                 if (status) status.textContent = 'API YouTube indisponible';
             });
     }
 
     function updateFloatingControls(pageDiv) {
         if (!pageDiv) return;
-        clearFloatingAudioPanel();
 
         const songTitleEls = Array.from(pageDiv.querySelectorAll('.song-title'));
         if (songTitleEls.length === 0) {
-            floatingControls.classList.add('hidden-control');
+            if (currentYoutubePlayer || (floatingAudioPanel && !floatingAudioPanel.classList.contains('hidden'))) {
+                floatingControls.classList.remove('hidden-control');
+            } else {
+                floatingControls.classList.add('hidden-control');
+            }
             return;
         }
 
@@ -589,13 +635,65 @@ function startCarnetApp() {
 
         const playPauseButton = document.createElement('button');
         playPauseButton.type = 'button';
-        playPauseButton.className = 'youtube-control-btn primary';
-        playPauseButton.textContent = 'Lecture';
+        playPauseButton.className = 'youtube-control-btn youtube-icon-btn primary';
+        playPauseButton.textContent = '▶';
+        playPauseButton.title = 'Lecture';
+        playPauseButton.setAttribute('aria-label', 'Lecture');
 
         const stopButton = document.createElement('button');
         stopButton.type = 'button';
-        stopButton.className = 'youtube-control-btn';
-        stopButton.textContent = 'Stop';
+        stopButton.className = 'youtube-control-btn youtube-icon-btn';
+        stopButton.textContent = '■';
+        stopButton.title = 'Stop';
+        stopButton.setAttribute('aria-label', 'Stop');
+
+        const skipAdButton = document.createElement('button');
+        skipAdButton.type = 'button';
+        skipAdButton.className = 'youtube-control-btn youtube-icon-btn youtube-skip-btn';
+        skipAdButton.textContent = '⏭';
+        skipAdButton.title = 'Passer la pub : stopper et relancer la lecture';
+        skipAdButton.setAttribute('aria-label', 'Passer la pub : stopper et relancer la lecture');
+        skipAdButton.disabled = true;
+
+        const youtubeExternalLink = document.createElement('a');
+        youtubeExternalLink.className = 'youtube-control-btn youtube-icon-btn youtube-youtube-link';
+        youtubeExternalLink.href = getYoutubeWatchUrl(youtubeId);
+        youtubeExternalLink.target = '_blank';
+        youtubeExternalLink.rel = 'noopener';
+        youtubeExternalLink.title = 'Lire sur YouTube';
+        youtubeExternalLink.setAttribute('aria-label', 'Lire sur YouTube');
+        youtubeExternalLink.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5a3 3 0 0 0-2.1 2.1A31 31 0 0 0 2 12a31 31 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22 12a31 31 0 0 0-.4-4.8z"></path>
+                <path d="M10 15.5v-7l6 3.5-6 3.5z"></path>
+            </svg>
+        `;
+
+        const timelineWrap = document.createElement('div');
+        timelineWrap.className = 'youtube-timeline-wrap';
+
+        const currentTimeEl = document.createElement('span');
+        currentTimeEl.className = 'youtube-time';
+        currentTimeEl.textContent = '0:00';
+
+        const timeline = document.createElement('input');
+        timeline.type = 'range';
+        timeline.className = 'youtube-timeline';
+        timeline.min = '0';
+        timeline.max = '0';
+        timeline.step = '1';
+        timeline.value = '0';
+        timeline.disabled = true;
+        timeline.title = 'Se déplacer dans le chant';
+        timeline.setAttribute('aria-label', 'Timeline du chant');
+
+        const durationEl = document.createElement('span');
+        durationEl.className = 'youtube-time';
+        durationEl.textContent = '--:--';
+
+        timelineWrap.appendChild(currentTimeEl);
+        timelineWrap.appendChild(timeline);
+        timelineWrap.appendChild(durationEl);
 
         const status = document.createElement('span');
         status.className = 'youtube-control-status';
@@ -618,10 +716,66 @@ function startCarnetApp() {
             if (!currentYoutubePlayer) return;
             currentYoutubePlayer.stopVideo();
             updateYoutubeControlState(playPauseButton, status, 'Arrêté', false);
+            stopYoutubeProgressTimer();
+            updateYoutubeTimeline();
+        });
+
+        skipAdButton.addEventListener('click', () => {
+            if (!currentYoutubePlayer) return;
+
+            skipAdButton.disabled = true;
+            stopYoutubeProgressTimer();
+            if (status) status.textContent = 'Relance YouTube...';
+
+            try {
+                if (typeof currentYoutubePlayer.stopVideo === 'function') {
+                    currentYoutubePlayer.stopVideo();
+                }
+            } catch (e) {}
+
+            setTimeout(() => {
+                if (!currentYoutubePlayer) return;
+
+                if (typeof currentYoutubePlayer.loadVideoById === 'function') {
+                    currentYoutubePlayer.loadVideoById({ videoId: youtubeId, startSeconds: 0 });
+                } else {
+                    createHiddenYoutubePlayer(youtubeId, hiddenPlayerHost, playPauseButton, stopButton, status, {
+                        timeline,
+                        currentTimeEl,
+                        durationEl,
+                        skipAdButton
+                    });
+                    return;
+                }
+
+                if (typeof currentYoutubePlayer.playVideo === 'function') {
+                    currentYoutubePlayer.playVideo();
+                }
+                skipAdButton.disabled = false;
+                updateYoutubeControlState(playPauseButton, status, 'Lecture YouTube', true);
+                startYoutubeProgressTimer();
+            }, 250);
+        });
+
+        timeline.addEventListener('input', () => {
+            isYoutubeSeeking = true;
+            currentTimeEl.textContent = formatYoutubeTime(Number(timeline.value));
+        });
+
+        timeline.addEventListener('change', () => {
+            if (currentYoutubePlayer && typeof currentYoutubePlayer.seekTo === 'function') {
+                currentYoutubePlayer.seekTo(Number(timeline.value), true);
+                currentYoutubePlayer.playVideo();
+            }
+            isYoutubeSeeking = false;
+            updateYoutubeTimeline();
         });
 
         controlStrip.appendChild(playPauseButton);
         controlStrip.appendChild(stopButton);
+        controlStrip.appendChild(timelineWrap);
+        controlStrip.appendChild(skipAdButton);
+        controlStrip.appendChild(youtubeExternalLink);
         controlStrip.appendChild(status);
         controlStrip.appendChild(hiddenPlayerHost);
 
@@ -631,7 +785,12 @@ function startCarnetApp() {
         floatingAudioPanel.classList.remove('hidden');
         floatingControls.classList.remove('hidden-control');
 
-        createHiddenYoutubePlayer(youtubeId, hiddenPlayerHost, playPauseButton, stopButton, status);
+        createHiddenYoutubePlayer(youtubeId, hiddenPlayerHost, playPauseButton, stopButton, status, {
+            timeline,
+            currentTimeEl,
+            durationEl,
+            skipAdButton
+        });
     };
 
 }
