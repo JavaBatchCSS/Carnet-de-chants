@@ -35,6 +35,12 @@ window.audio_map_data = {
       "youtubeId": "prqOrcS7yu4"
     }
   ],
+  "8": [
+    {
+      "title": "Ô Jésus, reste avec nous !",
+      "youtubeId": "NONE"
+    }
+  ],
   "9": [
     {
       "title": "Écoute la prière",
@@ -60,7 +66,7 @@ window.audio_map_data = {
   "12": [
     {
       "title": "Miserere de la mer",
-      "youtubeId": "iZKDf1QPu50"
+      "youtubeId": "rhjbR01MDOI"
     }
   ],
   "13": [
@@ -93,10 +99,22 @@ window.audio_map_data = {
       "youtubeId": "V_Jixpt0jqk"
     }
   ],
+  "18": [
+    {
+      "title": "Notre-Dame de la Paix",
+      "youtubeId": "NONE"
+    }
+  ],
   "19": [
     {
       "title": "Vierge des chemins de France",
       "youtubeId": "fMQKV1OiB7M"
+    }
+  ],
+  "20": [
+    {
+      "title": "Pour être généreux",
+      "youtubeId": "NONE"
     }
   ],
   "21": [
@@ -108,7 +126,7 @@ window.audio_map_data = {
   "22": [
     {
       "title": "Je mets ma confiance",
-      "youtubeId": "GegPmWvelFY"
+      "youtubeId": "NONE"
     }
   ],
   "23": [
@@ -126,7 +144,7 @@ window.audio_map_data = {
   "26": [
     {
       "title": "Ô ma troupe",
-      "youtubeId": "ysOU00W8iRk"
+      "youtubeId": "I7HAtcEet3g"
     }
   ],
   "27": [
@@ -174,7 +192,7 @@ window.audio_map_data = {
   "34": [
     {
       "title": "L'Espérance",
-      "youtubeId": "Bo1s03VUL50"
+      "youtubeId": "QrhH_Pi-1mA"
     }
   ],
   "35": [
@@ -186,13 +204,13 @@ window.audio_map_data = {
   "36": [
     {
       "title": "Chef de patrouille",
-      "youtubeId": "Ft_K7vs2tBk"
+      "youtubeId": "NONE"
     }
   ],
   "37": [
     {
       "title": "Chant des adieux",
-      "youtubeId": "xyH2d4KsJDQ"
+      "youtubeId": "hcgn0-iSSAw"
     }
   ],
   "38": [
@@ -231,6 +249,12 @@ window.audio_map_data = {
       "youtubeId": "-M5ASKCAmzk"
     }
   ],
+  "44": [
+    {
+      "title": "Le Chat noir",
+      "youtubeId": "wlWoz_XHNGg"
+    }
+  ],
   "45": [
     {
       "title": "Sur les monts",
@@ -240,13 +264,19 @@ window.audio_map_data = {
   "46": [
     {
       "title": "L'appel scout",
-      "youtubeId": "bGESEqw3zbI"
+      "youtubeId": "NONE"
     }
   ],
   "47": [
     {
       "title": "Au camp",
-      "youtubeId": "nG37mgA6xCY"
+      "youtubeId": "NONE"
+    }
+  ],
+  "48": [
+    {
+      "title": "On n'en finira donc jamais",
+      "youtubeId": "NONE"
     }
   ],
   "49": [
@@ -288,13 +318,13 @@ window.audio_map_data = {
   "55": [
     {
       "title": "La loi scoute",
-      "youtubeId": "DK6Kj5Vlkgk"
+      "youtubeId": "lO10WudZ4m8"
     }
   ],
   "56": [
     {
       "title": "Sur mon honneur",
-      "youtubeId": "19Sy0OyXk58"
+      "youtubeId": "NONE"
     },
     {
       "title": "Montjoie",
@@ -304,7 +334,7 @@ window.audio_map_data = {
   "57": [
     {
       "title": "L'alphabet scout",
-      "youtubeId": "RkQW7MaGTmA"
+      "youtubeId": "6lDQIRSpSWs"
     }
   ],
   "58": [
@@ -316,7 +346,7 @@ window.audio_map_data = {
   "59": [
     {
       "title": "La marche au camp",
-      "youtubeId": "NQcTgi_KprI"
+      "youtubeId": "NONE"
     }
   ],
   "60": [
@@ -352,7 +382,7 @@ window.audio_map_data = {
   "65": [
     {
       "title": "Chant de Troupe",
-      "youtubeId": "e1g1Q3lySPk"
+      "youtubeId": "NONE"
     }
   ],
   "66": [
@@ -448,7 +478,7 @@ window.audio_map_data = {
   "82": [
     {
       "title": "Santiano",
-      "youtubeId": "un_xO9RWKbs"
+      "youtubeId": "u1RIf_ovLPU"
     }
   ],
   "83": [
@@ -493,10 +523,22 @@ window.audio_map_data = {
       "youtubeId": "IpBnNK_eVmg"
     }
   ],
+  "90": [
+    {
+      "title": "Cruelle berceuse",
+      "youtubeId": "NONE"
+    }
+  ],
+  "91": [
+    {
+      "title": "Les cannibales",
+      "youtubeId": "NONE"
+    }
+  ],
   "92": [
     {
       "title": "Brave marin",
-      "youtubeId": "V065-EBGzNs"
+      "youtubeId": "8bq7VDqBvaw"
     }
   ],
   "93": [
@@ -508,7 +550,7 @@ window.audio_map_data = {
   "94": [
     {
       "title": "Guerre guerre, vente vent !",
-      "youtubeId": "PJxHWQy1bk4"
+      "youtubeId": "v12IBlZbE98"
     }
   ],
   "95": [
@@ -538,7 +580,7 @@ window.audio_map_data = {
   "99": [
     {
       "title": "Chanson de Monsieur Henri",
-      "youtubeId": "by-BACDq1qA"
+      "youtubeId": "pJHH6cFzFck"
     }
   ],
   "100": [
@@ -716,7 +758,7 @@ window.audio_map_data = {
   "129": [
     {
       "title": "Debout les gars",
-      "youtubeId": "KVdxpOqa-Yg"
+      "youtubeId": "MVIjBEnF4sc"
     }
   ],
   "130": [
@@ -729,6 +771,12 @@ window.audio_map_data = {
     {
       "title": "Le soldat belge",
       "youtubeId": "ngv0qAcfpds"
+    }
+  ],
+  "132": [
+    {
+      "title": "Pour Dieu et ma Patrie",
+      "youtubeId": "NONE"
     }
   ],
   "133": [
@@ -1193,6 +1241,12 @@ window.audio_map_data = {
       "youtubeId": "f26jp_WZGjA"
     }
   ],
+  "215": [
+    {
+      "title": "La choupe aux choux",
+      "youtubeId": "NONE"
+    }
+  ],
   "216": [
     {
       "title": "Les crocodiles",
@@ -1203,6 +1257,12 @@ window.audio_map_data = {
     {
       "title": "Cantique des étoiles",
       "youtubeId": "TAeu5SeUexg"
+    }
+  ],
+  "218": [
+    {
+      "title": "Ma Guadeloupe",
+      "youtubeId": "NONE"
     }
   ],
   "219": [
