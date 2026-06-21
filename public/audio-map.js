@@ -126,7 +126,7 @@ window.audio_map_data = {
   "22": [
     {
       "title": "Je mets ma confiance",
-      "youtubeId": "NONE"
+      "youtubeId": "GegPmWvelFY"
     }
   ],
   "23": [
@@ -144,7 +144,7 @@ window.audio_map_data = {
   "26": [
     {
       "title": "Ô ma troupe",
-      "youtubeId": "I7HAtcEet3g"
+      "youtubeId": "ysOU00W8iRk"
     }
   ],
   "27": [
@@ -204,13 +204,13 @@ window.audio_map_data = {
   "36": [
     {
       "title": "Chef de patrouille",
-      "youtubeId": "NONE"
+      "youtubeId": "Ft_K7vs2tBk"
     }
   ],
   "37": [
     {
       "title": "Chant des adieux",
-      "youtubeId": "hcgn0-iSSAw"
+      "youtubeId": "xyH2d4KsJDQ"
     }
   ],
   "38": [
@@ -264,13 +264,13 @@ window.audio_map_data = {
   "46": [
     {
       "title": "L'appel scout",
-      "youtubeId": "NONE"
+      "youtubeId": "bGESEqw3zbI"
     }
   ],
   "47": [
     {
       "title": "Au camp",
-      "youtubeId": "NONE"
+      "youtubeId": "nG37mgA6xCY"
     }
   ],
   "48": [
@@ -318,13 +318,13 @@ window.audio_map_data = {
   "55": [
     {
       "title": "La loi scoute",
-      "youtubeId": "lO10WudZ4m8"
+      "youtubeId": "DK6Kj5Vlkgk"
     }
   ],
   "56": [
     {
       "title": "Sur mon honneur",
-      "youtubeId": "NONE"
+      "youtubeId": "19Sy0OyXk58"
     },
     {
       "title": "Montjoie",
@@ -334,7 +334,7 @@ window.audio_map_data = {
   "57": [
     {
       "title": "L'alphabet scout",
-      "youtubeId": "6lDQIRSpSWs"
+      "youtubeId": "RkQW7MaGTmA"
     }
   ],
   "58": [
@@ -346,7 +346,7 @@ window.audio_map_data = {
   "59": [
     {
       "title": "La marche au camp",
-      "youtubeId": "NONE"
+      "youtubeId": "NQcTgi_KprI"
     }
   ],
   "60": [
@@ -382,7 +382,7 @@ window.audio_map_data = {
   "65": [
     {
       "title": "Chant de Troupe",
-      "youtubeId": "NONE"
+      "youtubeId": "e1g1Q3lySPk"
     }
   ],
   "66": [
@@ -478,7 +478,7 @@ window.audio_map_data = {
   "82": [
     {
       "title": "Santiano",
-      "youtubeId": "u1RIf_ovLPU"
+      "youtubeId": "un_xO9RWKbs"
     }
   ],
   "83": [
@@ -538,7 +538,7 @@ window.audio_map_data = {
   "92": [
     {
       "title": "Brave marin",
-      "youtubeId": "8bq7VDqBvaw"
+      "youtubeId": "V065-EBGzNs"
     }
   ],
   "93": [
@@ -550,7 +550,7 @@ window.audio_map_data = {
   "94": [
     {
       "title": "Guerre guerre, vente vent !",
-      "youtubeId": "v12IBlZbE98"
+      "youtubeId": "PJxHWQy1bk4"
     }
   ],
   "95": [
@@ -580,7 +580,7 @@ window.audio_map_data = {
   "99": [
     {
       "title": "Chanson de Monsieur Henri",
-      "youtubeId": "pJHH6cFzFck"
+      "youtubeId": "by-BACDq1qA"
     }
   ],
   "100": [
@@ -758,7 +758,7 @@ window.audio_map_data = {
   "129": [
     {
       "title": "Debout les gars",
-      "youtubeId": "MVIjBEnF4sc"
+      "youtubeId": "KVdxpOqa-Yg"
     }
   ],
   "130": [
