@@ -1258,10 +1258,17 @@ function init() {
 
     var start = Number(window.CARNET_START_PAGE) || 0;
     var hash = (location.hash || '').replace('#', '');
+    function arrive(id) {   // les polices et images changent la hauteur des pages : on se recale tant que le lecteur n'a pas défilé
+        var t0 = bookContainer.scrollTop, again = function () { if (Math.abs(bookContainer.scrollTop - t0) < 4) { scrollToId(id, true); t0 = bookContainer.scrollTop; } };
+        setTimeout(function () { scrollToId(id, true); t0 = bookContainer.scrollTop; }, 60);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(again, 50); });
+        window.addEventListener('load', function () { setTimeout(again, 50); });
+        setTimeout(again, 1200);
+    }
     if (start && document.getElementById('page-' + start)) {
-        setTimeout(function () { scrollToId('page-' + start, true); }, 60);
+        arrive('page-' + start);
     } else if (hash && document.getElementById(hash)) {
-        setTimeout(function () { scrollToId(hash, true); }, 60);
+        arrive(hash);
     } else {
         var last = store.get('last', 0);
         if (last > 5 && document.getElementById('page-' + last)) {
