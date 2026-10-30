@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#183059">
+    <title>Carnet de Chants</title>
+    <?!= include('Style') ?>
+    <?!= include('StyleExtra') ?>
+    <style>
+      /* Use the same side spacing as the search bar and avoid a hard 100px margin.
+        Allow horizontal scrolling if tabs overflow so nothing gets hidden. */
+      /* Center the nav and give it a limited max width so it floats with side margins */
+      .wrap-nav { width: auto !important; padding: 0 1rem !important; margin: 0.35rem auto !important; box-sizing: border-box; }
+      .wrap-nav .bar { width: 100% !important; max-width: 1500px !important; margin: 0 auto !important; padding: 0.35rem 0.5rem !important; display: flex; align-items: center; justify-content: space-between; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      /* Reduce the space between the tab bar and the search bar */
+      .search-bar { margin-top: 0.25rem !important; padding-top: 0.25rem !important; }
+
+      /* Remove side padding on header container so nav reaches edges */
+      #global-header { padding-left: 0 !important; padding-right: 0 !important; }
+
+      /* Slightly tighten tab spacing and ensure tabs are visible (scroll if needed) */
+      .wrap-nav .bar .tab { margin: 0 0.25rem !important; padding: 0.45rem 0.5rem !important; white-space: nowrap; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="global-header">
+        <!-- Navigation principale : onglets lus dans le projet « barre » (mise à jour automatique), rendu par App.html -->
+        <nav class="wrap-nav" id="siteNav" data-current-tab="documentation" aria-label="Navigation principale">
+          <div class="bar" id="siteNavBar"></div>
+        </nav>
+
+        <!-- Barre de recherche -->
+        <header class="search-bar">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Rechercher un chant, une parole ou une page…  ( / )" autocomplete="off" spellcheck="false" aria-label="Rechercher un chant, une parole ou une page" role="combobox" aria-expanded="false" aria-controls="search-results">
+                <button id="search-btn" type="button" aria-label="Rechercher">🔍</button>
+            </div>
+            <!-- Search Results (hidden by default) -->
+            <div id="search-results" class="search-results hidden" role="listbox" aria-label="Résultats"></div>
+        </header>
+    </div>
+
+    <main id="book-container" class="book-container" tabindex="-1">
+        <div id="loading" class="loading-msg">Chargement du carnet…</div>
+    </main>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <!-- Panneau de contrôle flottant -->
+    <div id="floating-controls" class="floating-controls hidden-control">
+        <div class="controls-current-song">
+            <span class="music-icon">🎵</span>
+            <span id="current-song-title">Sélectionnez un chant</span>
+        </div>
+        <div class="controls-buttons">
+            <button id="floating-play-btn" class="control-btn-play" title="Écouter le chant actuel">
+                <span>▶</span> Écouter
+            </button>
+        </div>
+        <div id="floating-audio-panel" class="floating-audio-panel hidden"></div>
+    </div>
+
+    <script>
+      window.CARNET_AUDIO = <?!= audioJson ?>;
+      window.CARNET_START_PAGE = <?= startPage ?>;
+      window.CARNET_BASE_URL = <?!= JSON.stringify(baseUrl) ?>;
+      window.__NAV__ = <?!= navJson ?>;
+      window.CARNET_CFG = <?!= cfgJson ?>;
+      window.CARNET_ANNEX = <?!= annexJson ?>;
+    </script>
+    <?!= include('DataSongs') ?>
+    <?!= include('DataPages') ?>
+    <?!= include('DataContent') ?>
+    <?!= include('App') ?>
+</body>
+</html>

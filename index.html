@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#183059">
     <title>Carnet de Chants</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/style.css?v=d36973c7">
+    
     <style>
       /* Use the same side spacing as the search bar and avoid a hard 100px margin.
         Allow horizontal scrolling if tabs overflow so nothing gets hidden. */
@@ -26,55 +28,27 @@
 <body>
 
     <div id="global-header">
-        <!-- <h1 class="app-title" style="text-align:center; color:#ffffff; font-family:'Cormorant Garamond', serif; font-weight:800; font-size:3rem; margin:0.2rem 0;">
-          <span style="vertical-align:middle;">Carnet de Chants</span>
-        </h1>
-        <h2 class="app-title" style="text-align:center; color:#ffffff; font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1rem; margin:0.2rem 0;">
-          <span style="vertical-align:middle;">Troupe Saint Elme</span>
-        </h2> -->
-        <!-- Navigation principale -->
-        <nav class="wrap-nav" data-current-tab="" aria-label="Navigation principale">
-          <div class="bar">
-            <a class="tab" data-tab="accueil" href="https://sites.google.com/fsggb.fr/principal/" target="_blank" rel="noopener">
-              <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3.1 2.6 10.9l1.2 1.4L5 11.4V21h5.9v-5.4h2.2V21H19v-9.6l1.2.9 1.2-1.4z"/></svg></span>
-              Accueil
-            </a>
-            <a class="tab" data-tab="archives" href="https://sites.google.com/fsggb.fr/archives" target="_blank" rel="noopener">
-              <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 5h18v5H3zm1.8 6.4h14.4V20H4.8zm3.1 2.5h8.2v1.9H7.9z"/></svg></span>
-              Archives
-            </a>
-            <a class="tab active" data-tab="documentation" href="https://sites.google.com/fsggb.fr/documentation" target="_blank" rel="noopener">
-              <span class="icon"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6zm8.2 1.9V8h3.1zM8.6 12h8v1.8h-8zm0 3.3h8v1.8h-8z"/></svg></span>
-              Documentation
-            </a>
-            <div class="ext">
-              <a class="tab" data-tab="ecole" href="https://www.saintjosephdescarmes.com/" target="_blank" rel="noopener">
-                <img class="logo" src="https://static.wixstatic.com/media/c1f88d_ea9f645e9d5b4d5fb80744d1d2a43fbb~mv2.png/v1/fill/w_44,h_48,al_c,q_85,enc_avif,quality_auto/blason%20fond%20transparent_edited.png" alt="Logo école" loading="lazy" decoding="async" width="22" height="22">
-                Site de l'école
-              </a>
-              <a class="tab" data-tab="federation" href="https://www.fsggb.fr/" target="_blank" rel="noopener">
-                <img class="logo" src="https://lh3.googleusercontent.com/pw/AP1GczNBrfpjXkpFikCrTgKqBGB5MCIlU2fSS-lP45c-ID_UHqP3mad46USRfqCfzhE2JOVqt4RFVnNC8YI7zaskkyMTv8Zq28-xGaRh8cndsnmm9ZydS87qytOutC0ZYOpWlbBFKVQTRl_7G-W9Nv-JzvqJ=w299-h296-s-no-gm?authuser=0" alt="Logo Fédération" loading="lazy" decoding="async" width="22" height="22">
-                Site de la Fédération
-              </a>
-            </div>
-          </div>
+        <!-- Navigation principale : onglets lus dans le projet « barre » (mise à jour automatique), rendu par App.html -->
+        <nav class="wrap-nav" id="siteNav" data-current-tab="documentation" aria-label="Navigation principale">
+          <div class="bar" id="siteNavBar"></div>
         </nav>
 
         <!-- Barre de recherche -->
         <header class="search-bar">
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Rechercher un chant ou une page...">
-                <button id="search-btn">🔍</button>
+                <input type="text" id="search-input" placeholder="Rechercher un chant, une parole ou une page…  ( / )" autocomplete="off" spellcheck="false" aria-label="Rechercher un chant, une parole ou une page" role="combobox" aria-expanded="false" aria-controls="search-results">
+                <button id="search-btn" type="button" aria-label="Rechercher">🔍</button>
             </div>
             <!-- Search Results (hidden by default) -->
-            <div id="search-results" class="search-results hidden"></div>
+            <div id="search-results" class="search-results hidden" role="listbox" aria-label="Résultats"></div>
         </header>
     </div>
 
-    <!-- Conteneur principal (scroll-snapping) -->
-    <main id="book-container" class="book-container">
-        <!-- Le sommaire et les pages seront injectés ici par app.js -->
+    <main id="book-container" class="book-container" tabindex="-1">
+        <div id="loading" class="loading-msg">Chargement du carnet…</div>
     </main>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
     <!-- Panneau de contrôle flottant -->
     <div id="floating-controls" class="floating-controls hidden-control">
@@ -91,61 +65,13 @@
     </div>
 
     <script>
-      (function loadFreshAppScripts(){
-        const version = Date.now().toString();
-        const scripts = [
-          'public/audio-map.js',
-          'public/songs-index.js',
-          'public/pages-index.js',
-          'public/page-content.js',
-          'app.js'
-        ];
-
-        function loadScript(src) {
-          return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = `${src}${src.includes('?') ? '&' : '?'}v=${version}`;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error(`Impossible de charger ${src}`));
-            document.body.appendChild(script);
-          });
-        }
-
-        scripts.reduce((chain, src) => chain.then(() => loadScript(src)), Promise.resolve())
-          .catch((error) => {
-            console.error(error);
-            const book = document.getElementById('book-container');
-            if (book) {
-              book.innerHTML = '<div style="text-align:center; padding:50px;">Erreur lors du chargement des fichiers de données.</div>';
-            }
-          });
-      })();
+      window.CARNET_START_PAGE = Number(new URLSearchParams(location.search).get('p')) || 0;
+      window.CARNET_BASE_URL = location.origin + location.pathname;
+      window.__NAV__ = null;
+      window.CARNET_CFG = {"textPages":[1,2,3,4,6],"ytHost":"https://www.youtube-nocookie.com","playerSource":"hidden","navTab":"documentation","navBase":"https://script.google.com/macros/s/AKfycbw2ZbmN4o1EO5kfj5MLHtzgPXwTEWYU1s3n37ew2WzuGEDtRcXn-jXjxEbi2U0cUI-z/exec","navDomain":"fsggb.fr","navFallback":[{"cle":"accueil","libelle":"Accueil","url":"https://sites.google.com/fsggb.fr/principal/","groupe":"gauche","icone":"maison"},{"cle":"archives","libelle":"Archives","url":"https://sites.google.com/fsggb.fr/archives","groupe":"gauche","icone":"archive"},{"cle":"documentation","libelle":"Documentation","url":"https://sites.google.com/fsggb.fr/documentation","groupe":"gauche","icone":"doc"},{"cle":"ecole","libelle":"Site de l’école","url":"https://www.saintjosephdescarmes.com/","groupe":"droite","icone":"externe"},{"cle":"federation","libelle":"Site de la Fédération","url":"https://www.fsggb.fr/","groupe":"droite","icone":"externe"}],"imgBase":"data/pdf-pages/"};
+      window.CARNET_ANNEX = null;
     </script>
-    <script>
-      (function adjustBookOffset(){
-        const header = document.getElementById('global-header');
-        const book = document.getElementById('book-container');
-        if (!header || !book) return;
-        function update(){
-          const h = Math.ceil(header.getBoundingClientRect().height);
-          // add small gap so the title isn't flush against the header
-          const gap = 8;
-          book.style.paddingTop = (h + gap) + 'px';
-          book.style.scrollPaddingTop = (h + gap) + 'px';
-        }
-        window.addEventListener('resize', update);
-        window.addEventListener('load', update);
-        document.addEventListener('DOMContentLoaded', update);
-        if (window.ResizeObserver) {
-          try {
-            const ro = new ResizeObserver(update);
-            ro.observe(header);
-          } catch (e) {
-            // ignore if ResizeObserver not available or errors
-          }
-        }
-        update();
-      })();
-    </script>
+    <script src="data/carnet-data.js?v=ed0eeea9"></script>
+    <script src="assets/app.js?v=8f5cab07"></script>
 </body>
 </html>

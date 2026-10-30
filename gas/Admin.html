@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base target="_blank">
+<title>Administration du carnet</title>
+<style>
+  :root { --accent:#183059; --bg:#f4f1e8; --card:#fff; --line:#d9d3c2; --ok:#1f7a3d; --warn:#b26a00; --bad:#b3261e; --muted:#6b6558; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:#1a2536; }
+  header { background:var(--accent); color:#fff; padding:10px 16px 0; position:sticky; top:0; z-index:5; }
+  .top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .top h1 { font-size:17px; margin:0; flex:1; }
+  .top a { color:#fff; font-size:14px; }
+  nav[role=tablist] { display:flex; gap:2px; margin-top:8px; overflow-x:auto; }
+  nav button { background:transparent; color:#cdd6e6; border:0; border-radius:8px 8px 0 0; padding:9px 16px; font:inherit; font-weight:600; cursor:pointer; white-space:nowrap; }
+  nav button[aria-selected=true] { background:var(--bg); color:var(--accent); }
+  nav button:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline:3px solid #f4c542; outline-offset:1px; }
+  main { max-width:1200px; margin:0 auto; padding:16px; }
+  section[role=tabpanel][hidden] { display:none; }
+  button, .btn { font:inherit; cursor:pointer; border-radius:8px; border:1px solid var(--accent); background:#fff; color:var(--accent); padding:7px 13px; }
+  button.primary { background:var(--accent); color:#fff; }
+  button.danger { border-color:var(--bad); color:var(--bad); }
+  button:disabled { opacity:.5; cursor:wait; }
+  input[type=text], textarea, select { font:inherit; padding:7px 9px; border:1px solid #b9b3a3; border-radius:8px; width:100%; background:#fff; }
+  textarea { font-family:ui-monospace, Consolas, monospace; font-size:14px; min-height:240px; resize:vertical; }
+  label { display:block; font-weight:600; margin:10px 0 4px; }
+  .hint { font-size:13px; color:var(--muted); font-weight:400; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .stats { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 12px; }
+  .chip { padding:3px 11px; border-radius:14px; font-size:13px; background:#fff; border:1px solid var(--line); cursor:pointer; user-select:none; }
+  .chip[aria-pressed=true] { background:var(--accent); color:#fff; border-color:var(--accent); }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; font-size:14px; }
+  th, td { padding:8px 10px; border-bottom:1px solid #eee7d6; text-align:left; vertical-align:top; }
+  th { background:#ece7d6; }
+  .st { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; font-weight:700; color:#fff; }
+  .st.ok { background:var(--ok); } .st.suspect { background:var(--warn); } .st.blocked, .st.missing { background:var(--bad); } .st.none { background:#777; }
+  .note { font-size:12.5px; color:var(--muted); }
+  .row-edit { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .row-edit input { width:230px; }
+  .cands { margin-top:6px; display:grid; gap:6px; }
+  .cand { display:flex; gap:10px; align-items:center; background:#faf8f1; border:1px solid #e5dfcd; border-radius:8px; padding:6px; }
+  .cand img { width:96px; height:54px; object-fit:cover; border-radius:4px; }
+  .cand .t { flex:1; min-width:0; font-size:13px; }
+  .banner { background:#fff3e0; border:1px solid #f0c27a; border-radius:10px; padding:8px 12px; margin-bottom:12px; font-size:14px; }
+  .grid { display:grid; grid-template-columns:300px 1fr; gap:16px; align-items:start; }
+  .parts { display:grid; gap:8px; }
+  .part { display:flex; gap:10px; align-items:center; padding:10px; border:2px solid var(--line); border-radius:10px; background:#fff; cursor:pointer; text-align:left; width:100%; color:inherit; }
+  .part[aria-pressed=true] { border-color:var(--accent); background:#eef2fa; }
+  .badge { width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex:none; }
+  .part .n { margin-left:auto; color:var(--muted); font-size:13px; }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .preview { background:#fbfaf6; border:1px solid var(--line); border-radius:10px; padding:16px; min-height:240px; font-family:Georgia, "Times New Roman", serif; }
+  .preview .song-title { font-size:26px; text-align:center; color:var(--accent); margin:0 0 10px; font-weight:700; }
+  .preview .song-head { display:flex; justify-content:center; }
+  .preview .verse { margin:0 0 12px; padding-left:28px; position:relative; }
+  .preview .verse.nonum { padding-left:0; }
+  .preview .verse-number { position:absolute; left:0; font-weight:700; color:var(--accent); }
+  .preview .refrain { font-style:italic; margin:6px 0 14px; padding:2px 0 2px 14px; border-left:3px solid var(--accent); }
+  .preview .refrain-label { font-weight:700; color:var(--accent); }
+  .preview .cols { column-count:2; column-gap:28px; } .preview .cols.c3 { column-count:3; }
+  .preview .song-actions { display:none; }
+  .checks { display:grid; gap:6px; }
+  .check { display:flex; gap:10px; align-items:flex-start; padding:9px 12px; border-radius:10px; background:#fff; border:1px solid var(--line); }
+  .check .dot { width:22px; height:22px; border-radius:50%; flex:none; color:#fff; font-weight:700; text-align:center; line-height:22px; }
+  .check.ok .dot { background:var(--ok); } .check.ko .dot { background:var(--bad); }
+  .toast { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#1a2536; color:#fff; padding:9px 16px; border-radius:10px; max-width:92vw; z-index:20; box-shadow:0 6px 20px rgba(0,0,0,.25); }
+  .toast.bad { background:var(--bad); }
+  .toast[hidden] { display:none; }
+  .modal { position:fixed; inset:0; background:rgba(15,23,42,.5); display:flex; align-items:center; justify-content:center; z-index:30; padding:16px; }
+  .modal[hidden] { display:none; }
+  .modal .box { background:#fff; border-radius:12px; padding:18px; max-width:440px; width:100%; box-shadow:0 12px 40px rgba(0,0,0,.35); }
+  .modal p { margin:0 0 14px; white-space:pre-line; }
+  details { margin:6px 0; } summary { cursor:pointer; font-weight:600; }
+  pre.help { background:#f4f1e8; padding:8px 10px; border-radius:8px; font-size:13px; white-space:pre-wrap; }
+  @media (max-width: 860px) {
+    .grid, .split { grid-template-columns:1fr; }
+    table, thead, tbody, tr, td { display:block; width:100%; }
+    thead { display:none; }
+    tr { border-bottom:2px solid var(--line); padding:6px 0; }
+    td { border:0; padding:3px 10px; }
+    .row-edit input { width:100%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>🎵 Administration du carnet</h1>
+    <a href="<?!= baseUrl ?>" target="_top">← Retour au carnet</a>
+  </div>
+  <nav role="tablist" aria-label="Sections">
+    <button role="tab" id="t-audio" aria-controls="p-audio" aria-selected="true">Audio des chants</button>
+    <button role="tab" id="t-annex" aria-controls="p-annex" aria-selected="false">Annexes</button>
+    <button role="tab" id="t-player" aria-controls="p-player" aria-selected="false">Lecteur</button>
+    <button role="tab" id="t-check" aria-controls="p-check" aria-selected="false">Contrôle</button>
+  </nav>
+</header>
+
+<main>
+<!-- ============ AUDIO ============ -->
+<section role="tabpanel" id="p-audio" aria-labelledby="t-audio">
+  <div class="bar">
+    <button class="primary" id="audit" title="≈ 5 unités de quota">Vérifier tous les liens</button>
+    <button id="fill" title="100 unités de quota par chant">Chercher les vidéos manquantes</button>
+    <input type="text" id="q" placeholder="Filtrer par titre ou page…" aria-label="Filtrer" style="max-width:260px">
+  </div>
+  <div id="reports" class="banner" hidden></div>
+  <div class="stats" id="stats" role="group" aria-label="Filtres d’état"></div>
+  <table>
+    <thead><tr><th>Page</th><th>Chant</th><th>Vidéo</th><th>État</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</section>
+
+<!-- ============ ANNEXES ============ -->
+<section role="tabpanel" id="p-annex" aria-labelledby="t-annex" hidden>
+  <div class="banner">Les annexes sont <b>hors de la version PDF</b> : les pages 1 à 246 ne bougent jamais. Chaque partie a une lettre (A, B…), ses chants sont numérotés A1, A2… (le numéro libre le plus bas est attribué automatiquement), et la partie dispose de sa propre page d’index dans le carnet.</div>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h3 style="margin:0 0 8px">Parties</h3>
+        <div class="parts" id="parts"></div>
+        <form id="partForm" style="margin-top:12px">
+          <label for="partName" id="partFormTitle">Nouvelle partie</label>
+          <input type="text" id="partName" maxlength="60" placeholder="Ex. Chants de Noël" required>
+          <label for="partIntro">Présentation <span class="hint">(facultatif)</span></label>
+          <input type="text" id="partIntro" maxlength="400" placeholder="Une phrase affichée sur la page d’index">
+          <div class="bar" style="margin:10px 0 0">
+            <button class="primary" type="submit" id="partSave">Créer</button>
+            <button type="button" id="partCancel" hidden>Annuler</button>
+            <button type="button" class="danger" id="partDelete" hidden>Supprimer</button>
+          </div>
+        </form>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3 style="margin:0 0 6px">Historique</h3>
+        <div id="annexLog" class="note">—</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="bar" style="margin-bottom:6px">
+          <h3 style="margin:0;flex:1" id="songsTitle">Chants de la partie</h3>
+          <button id="newSong" class="primary">+ Nouveau chant</button>
+        </div>
+        <table id="songsTable" hidden><thead><tr><th>N°</th><th>Titre</th><th>Vidéo</th><th></th></tr></thead><tbody id="songRows"></tbody></table>
+        <div id="songsEmpty" class="note">Créez ou sélectionnez une partie.</div>
+      </div>
+      <form id="songForm" class="card" style="margin-top:12px" hidden>
+        <h3 style="margin:0" id="editorTitle">Nouveau chant</h3>
+        <div class="split">
+          <div>
+            <label for="sTitle">Titre</label>
+            <input type="text" id="sTitle" maxlength="100" required>
+            <label for="sBody">Paroles</label>
+            <textarea id="sBody" spellcheck="true" aria-describedby="bodyHelp" placeholder="Refrain :&#10;Ligne 1&#10;Ligne 2&#10;&#10;1 - Premier couplet&#10;…"></textarea>
+            <details id="bodyHelp"><summary>Comment saisir les paroles</summary>
+<pre class="help">• Une ligne vide sépare les couplets.
+• « Refrain : » (ou « Refrain final : », « Coda : ») en début de bloc → refrain.
+• « 1 - … » ou « 1. … » → couplet numéroté ; sans numéros, ils sont numérotés automatiquement (option ci-dessous).
+• Chaque ligne = un vers. Ajoutez « (bis) » à la main si besoin.</pre></details>
+            <div class="split">
+              <div><label for="sCols">Colonnes</label><select id="sCols"><option value="1">1 (texte courant)</option><option value="2">2 colonnes</option><option value="3">3 colonnes</option></select></div>
+              <div><label for="sNum">Numérotation</label><select id="sNum"><option value="auto">Automatique si absente</option><option value="none">Aucune</option></select></div>
+            </div>
+            <label for="sYt">Vidéo YouTube <span class="hint">(lien ou identifiant, facultatif)</span></label>
+            <div class="row-edit" style="margin-top:0"><input type="text" id="sYt" style="flex:1;width:auto"><button type="button" id="sSearch">Chercher</button></div>
+            <div class="cands" id="sCands"></div>
+            <div class="bar" style="margin-top:14px">
+              <button class="primary" type="submit" id="sSave">Enregistrer</button>
+              <button type="button" id="sCancel">Fermer</button>
+              <span class="note" id="sInfo"></span>
+            </div>
+          </div>
+          <div>
+            <label>Aperçu <span class="hint">(identique au carnet)</span></label>
+            <div class="preview" id="preview" aria-live="polite"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LECTEUR ============ -->
+<section role="tabpanel" id="p-player" aria-labelledby="t-player" hidden>
+  <p class="note">Choisissez comment les chants sont lus. Le changement s’applique à tous les visiteurs dès leur prochain chargement du carnet.</p>
+  <fieldset style="border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;margin:0 0 12px;background:#fff">
+    <legend>Source de lecture</legend>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="radio" name="psrc" value="youtube">
+      <span><b>YouTube officiel</b><br><span class="note">Lecteur intégré officiel, vidéo affichable. YouTube peut y diffuser des publicités.</span></span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="radio" name="psrc" value="hidden">
+      <span><b>YouTube masqué (système du carnet GitHub)</b><br><span class="note">Même lecteur officiel, mais la vidéo n’est jamais affichée : seules les publicités audio peuvent passer, le bouton ↻ arrête et relance le chant pour les passer. Fonctionne sans service tiers.</span></span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="radio" name="psrc" value="invidious">
+      <span><b>Alternative sans publicité (Invidious)</b><br><span class="note">Audio seul, aucune vidéo ni publicité, via une instance Invidious publique.</span></span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="radio" name="psrc" value="piped">
+      <span><b>Alternative sans publicité (Piped)</b><br><span class="note">Audio seul, aucune vidéo ni publicité. S’appuie sur des instances Piped publiques, parfois instables : l’alternative n’est pas couverte par les conditions de l’API YouTube.</span></span></label>
+  </fieldset>
+  <label for="iInst" class="note">Instances Invidious (une par ligne, essayées dans l’ordre)</label>
+  <textarea id="iInst" rows="3" style="width:100%;font:13px/1.4 monospace;box-sizing:border-box"></textarea>
+  <label for="pInst" class="note">Instances Piped (une par ligne, essayées dans l’ordre)</label>
+  <textarea id="pInst" rows="4" style="width:100%;font:13px/1.4 monospace;box-sizing:border-box"></textarea>
+  <div class="bar" style="margin-top:10px">
+    <button class="primary" id="pSave">Enregistrer</button>
+    <button id="pTest">Tester les instances</button>
+    <span class="note" id="pMsg"></span>
+  </div>
+  <div class="checks" id="pChecks"></div>
+</section>
+
+<!-- ============ CONTRÔLE ============ -->
+<section role="tabpanel" id="p-check" aria-labelledby="t-check" hidden>
+  <div class="bar">
+    <button class="primary" id="runCheck">Lancer le contrôle</button>
+    <button id="runDeep" title="Crée puis supprime une partie d’annexe temporaire (Z)">Contrôle approfondi (avec écriture de test)</button>
+    <span class="note" id="checkMsg"></span>
+  </div>
+  <div class="checks" id="checks"></div>
+</section>
+</main>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalMsg"><div class="box"><p id="modalMsg"></p><div class="bar" style="justify-content:flex-end;margin:0"><button id="modalNo" type="button">Annuler</button><button id="modalOk" type="button" class="danger">Confirmer</button></div></div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+var $ = function (s) { return document.querySelector(s); };
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function run(fn, args) {
+  return new Promise(function (res, rej) {
+    var r = google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { rej(new Error((e && e.message) || String(e))); });
+    r[fn].apply(r, args || []);
+  });
+}
+function fmt(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+var toastTimer;
+function toast(t, bad) { var n = $('#toast'); n.textContent = t; n.className = 'toast' + (bad ? ' bad' : ''); n.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { n.hidden = true; }, bad ? 7000 : 3000); }
+/** Confirmation dans la page (les boîtes confirm() natives sont bloquées dans le cadre sécurisé d'Apps Script). */
+function ask(message, okLabel) {
+  return new Promise(function (resolve) {
+    var m = $('#modal'), ok = $('#modalOk'), no = $('#modalNo'), prev = document.activeElement;
+    $('#modalMsg').textContent = message; ok.textContent = okLabel || 'Confirmer'; m.hidden = false; no.focus();
+    function done(v) { m.hidden = true; ok.onclick = no.onclick = null; document.removeEventListener('keydown', onKey); if (prev && prev.focus) prev.focus(); resolve(v); }
+    function onKey(e) { if (e.key === 'Escape') done(false); }
+    document.addEventListener('keydown', onKey);
+    ok.onclick = function () { done(true); }; no.onclick = function () { done(false); };
+  });
+}
+function busy(btn, on) { if (btn) btn.disabled = !!on; }
+function fail(e, btn) { busy(btn, false); toast(e.message || String(e), true); }
+
+/* ---------- Onglets ---------- */
+var TABS = ['audio', 'annex', 'player', 'check'];
+function showTab(name, push) {
+  TABS.forEach(function (t) {
+    var on = t === name;
+    $('#t-' + t).setAttribute('aria-selected', on ? 'true' : 'false');
+    $('#t-' + t).tabIndex = on ? 0 : -1;
+    $('#p-' + t).hidden = !on;
+  });
+  try { if (push !== false) history.replaceState(null, '', '#' + name); } catch (e) { /* iframe */ }
+  if (name === 'annex' && !annexLoaded) loadAnnex();
+  if (name === 'player' && !playerLoaded) loadPlayer();
+}
+TABS.forEach(function (t, i) {
+  $('#t-' + t).addEventListener('click', function () { showTab(t); });
+  $('#t-' + t).addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (d) { var n = TABS[(i + d + TABS.length) % TABS.length]; showTab(n); $('#t-' + n).focus(); }
+  });
+});
+
+/* ======================= AUDIO ======================= */
+var rows = [], filter = 'all', textFilter = '';
+var LABEL = { ok: 'OK', suspect: 'À vérifier', blocked: 'Bloquée', missing: 'Introuvable', none: 'Sans audio' };
+function pageLabel(r) { return r.label || r.page; }
+
+function renderStats() {
+  var c = { all: rows.length }; rows.forEach(function (r) { c[r.status] = (c[r.status] || 0) + 1; });
+  var box = $('#stats'); box.innerHTML = '';
+  ['all', 'ok', 'suspect', 'blocked', 'missing', 'none'].forEach(function (k) {
+    if (!c[k] && k !== 'all') return;
+    var ch = el('button', 'chip', (k === 'all' ? 'Tous' : LABEL[k]) + ' · ' + (c[k] || 0));
+    ch.type = 'button'; ch.setAttribute('aria-pressed', filter === k ? 'true' : 'false');
+    ch.onclick = function () { filter = k; render(); };
+    box.appendChild(ch);
+  });
+}
+function render() {
+  renderStats();
+  var tb = $('#rows'); tb.innerHTML = '';
+  var q = textFilter.toLowerCase();
+  rows.filter(function (r) {
+    return (filter === 'all' || r.status === filter) && (!q || (r.title + ' ' + pageLabel(r)).toLowerCase().indexOf(q) !== -1);
+  }).forEach(function (r) { tb.appendChild(renderRow(r)); });
+}
+function renderRow(r) {
+  var tr = el('tr');
+  tr.appendChild(el('td', null, pageLabel(r)));
+  tr.appendChild(el('td', null, r.title));
+  var v = el('td');
+  if (r.video) {
+    var a = el('a', null, r.video.title); a.href = 'https://www.youtube.com/watch?v=' + r.youtubeId; v.appendChild(a);
+    v.appendChild(el('div', 'note', r.video.channel + ' · ' + fmt(r.video.secs) + ' · ' + r.youtubeId));
+  } else v.appendChild(el('div', 'note', r.youtubeId));
+  var edit = el('div', 'row-edit');
+  var inp = el('input'); inp.type = 'text'; inp.placeholder = 'Lien ou identifiant YouTube'; inp.setAttribute('aria-label', 'Lien YouTube pour ' + r.title);
+  var save = el('button', null, 'Enregistrer');
+  save.onclick = function () { saveEntry(r, inp.value, save); };
+  var search = el('button', null, 'Chercher');
+  var cands = el('div', 'cands');
+  search.onclick = function () { findCandidates(r.title, cands, search, function (id, b) { return saveEntry(r, id, b); }); };
+  edit.appendChild(inp); edit.appendChild(save); edit.appendChild(search);
+  v.appendChild(edit); v.appendChild(cands);
+  tr.appendChild(v);
+  var s = el('td'); s.appendChild(el('span', 'st ' + r.status, LABEL[r.status]));
+  (r.notes || []).forEach(function (n) { s.appendChild(el('div', 'note', n)); });
+  tr.appendChild(s);
+  r._tr = tr; r._cands = cands;
+  return tr;
+}
+function saveEntry(r, value, btn) {
+  if (!value.trim()) { toast('Saisissez un lien ou un identifiant.', true); return Promise.resolve(); }
+  busy(btn, true);
+  return run('adminSaveEntry', [r.page, r.index, value, false]).then(function (res) {
+    r.youtubeId = res.youtubeId; r.video = res.video || null; r.status = res.youtubeId === 'NONE' ? 'none' : 'ok'; r.notes = [];
+    toast('Enregistré : ' + r.title);
+    r._tr.replaceWith(renderRow(r));
+  }).catch(function (e) { fail(e, btn); });
+}
+function findCandidates(title, box, btn, onPick) {
+  busy(btn, true); box.innerHTML = '';
+  return run('adminSearch', [title]).then(function (list) {
+    if (!list.length) box.appendChild(el('div', 'note', 'Aucune vidéo intégrable trouvée.'));
+    list.forEach(function (v) {
+      var c = el('div', 'cand');
+      var img = el('img'); img.src = 'https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg'; img.alt = ''; img.loading = 'lazy';
+      var t = el('div', 't');
+      var a = el('a', null, v.title); a.href = 'https://www.youtube.com/watch?v=' + v.id;
+      t.appendChild(a); t.appendChild(el('div', 'note', v.channel + ' · ' + fmt(v.secs) + ' · pertinence ' + v.score));
+      var pick = el('button', 'primary', 'Choisir');
+      pick.type = 'button';
+      pick.onclick = function () { onPick(v.id, pick); };
+      c.appendChild(img); c.appendChild(t); c.appendChild(pick);
+      box.appendChild(c);
+    });
+    busy(btn, false);
+  }).catch(function (e) { fail(e, btn); });
+}
+$('#audit').onclick = function () {
+  var b = this; busy(b, true); toast('Vérification auprès de YouTube…');
+  run('adminAudit').then(function (res) { rows = res; filter = 'all'; render(); toast('Vérification terminée : ' + res.length + ' entrées.'); busy(b, false); }).catch(function (e) { fail(e, b); });
+};
+$('#fill').onclick = function () {
+  var b = this;
+  var todo = rows.filter(function (r) { return ['none', 'missing', 'blocked'].indexOf(r.status) !== -1; });
+  if (!todo.length) { toast('Lancez d’abord la vérification (rien à corriger sinon).', true); return; }
+  ask('Lancer ' + todo.length + ' recherches (≈ ' + todo.length * 100 + ' unités de quota sur 10 000 par jour) ?', 'Lancer').then(function (yes) {
+    if (!yes) return;
+    busy(b, true); filter = 'all'; render();
+    var chain = Promise.resolve(), done = 0;
+    todo.forEach(function (r) {
+      chain = chain.then(function () { return findCandidates(r.title, r._cands, el('button'), function (id, pb) { return saveEntry(r, id, pb); }); }).then(function () { toast('Recherche ' + (++done) + ' / ' + todo.length); });
+    });
+    chain.then(function () { toast('Recherches terminées : choisissez la bonne vidéo pour chaque chant.'); busy(b, false); });
+  });
+};
+$('#q').addEventListener('input', function () { textFilter = this.value.trim(); render(); });
+
+run('adminListEntries').then(function (res) {
+  rows = res.entries.map(function (e) { return { page: e.page, index: e.index, title: e.title, youtubeId: e.youtubeId, label: e.label,
+    status: e.youtubeId === 'NONE' ? 'none' : 'ok', notes: [] }; });
+  render();
+  if (res.reports.length) {
+    var box = $('#reports'); box.hidden = false;
+    box.textContent = '⚠ Lectures impossibles signalées par des utilisateurs : ' + res.reports.map(function (x) { return 'p.' + x.page + ' (' + x.id + ', ×' + x.n + ')'; }).join(' · ');
+  }
+}).catch(function (e) { fail(e); });
+
+/* ======================= ANNEXES ======================= */
+var annex = { parts: [], songs: [], nextLabels: {}, log: [] }, annexLoaded = false, curPart = null, editing = null, partEditing = null;
+
+function loadAnnex() {
+  return run('adminAnnexList').then(function (res) {
+    annex = res; annexLoaded = true;
+    if (!curPart || !annex.parts.some(function (p) { return p.letter === curPart; })) curPart = annex.parts.length ? annex.parts[0].letter : null;
+    renderAnnex();
+  }).catch(fail);
+}
+function songsOf(letter) { return annex.songs.filter(function (s) { return s.letter === letter; }); }
+
+function renderAnnex() {
+  var box = $('#parts'); box.innerHTML = '';
+  annex.parts.forEach(function (p) {
+    var b = el('button', 'part'); b.type = 'button'; b.setAttribute('aria-pressed', p.letter === curPart ? 'true' : 'false');
+    b.appendChild(el('span', 'badge', p.letter));
+    var t = el('span'); t.appendChild(el('b', null, p.name));
+    b.appendChild(t); b.appendChild(el('span', 'n', songsOf(p.letter).length + ' chant(s)'));
+    b.onclick = function () { curPart = p.letter; closeEditor(); setPartForm(p); renderAnnex(); };
+    box.appendChild(b);
+  });
+  if (!annex.parts.length) box.appendChild(el('div', 'note', 'Aucune partie pour le moment.'));
+  var part = annex.parts.filter(function (p) { return p.letter === curPart; })[0];
+  $('#songsTitle').textContent = part ? 'Annexe ' + part.letter + ' — ' + part.name : 'Chants de la partie';
+  $('#newSong').disabled = !part;
+  var list = part ? songsOf(part.letter) : [];
+  $('#songsTable').hidden = !list.length;
+  $('#songsEmpty').hidden = !!list.length;
+  $('#songsEmpty').textContent = part ? 'Aucun chant dans cette partie. Prochain numéro : ' + (annex.nextLabels[part.letter] || '—') : 'Créez ou sélectionnez une partie.';
+  var tb = $('#songRows'); tb.innerHTML = '';
+  list.forEach(function (s) {
+    var tr = el('tr');
+    tr.appendChild(el('td', null, s.label));
+    tr.appendChild(el('td', null, s.title));
+    var v = el('td'); if (s.youtubeId) { var a = el('a', null, s.youtubeId); a.href = 'https://www.youtube.com/watch?v=' + s.youtubeId; v.appendChild(a); } else v.appendChild(el('span', 'note', 'aucune'));
+    tr.appendChild(v);
+    var act = el('td');
+    var ed = el('button', null, 'Modifier'); ed.onclick = function () { openEditor(s); };
+    var del = el('button', 'danger', 'Supprimer'); del.style.marginLeft = '6px';
+    del.onclick = function () {
+      ask('Supprimer « ' + s.title + ' » (' + s.label + ') ?\nLe numéro ' + s.label + ' redeviendra disponible.', 'Supprimer').then(function (yes) {
+        if (!yes) return;
+        busy(del, true);
+        return run('adminAnnexDeleteSong', [s.page]).then(function () { toast('Supprimé : ' + s.label); if (editing && editing.page === s.page) closeEditor(); return loadAnnex(); }).catch(function (e) { fail(e, del); });
+      });
+    };
+    act.appendChild(ed); act.appendChild(del); tr.appendChild(act);
+    tb.appendChild(tr);
+  });
+  var lg = $('#annexLog'); lg.innerHTML = '';
+  (annex.log || []).slice(0, 8).forEach(function (l) { var d = el('div', null, new Date(l.t).toLocaleString('fr-FR') + ' · ' + l.what); lg.appendChild(d); });
+  if (!(annex.log || []).length) lg.textContent = 'Aucune modification pour le moment.';
+}
+
+/* --- parties --- */
+function setPartForm(p) {
+  partEditing = p ? p.letter : null;
+  $('#partFormTitle').textContent = p ? 'Modifier la partie ' + p.letter : 'Nouvelle partie';
+  $('#partName').value = p ? p.name : ''; $('#partIntro').value = p ? (p.intro || '') : '';
+  $('#partSave').textContent = p ? 'Enregistrer' : 'Créer';
+  $('#partCancel').hidden = !p; $('#partDelete').hidden = !p;
+}
+$('#partForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var b = $('#partSave'); busy(b, true);
+  run('adminAnnexSavePart', [{ letter: partEditing, name: $('#partName').value, intro: $('#partIntro').value }]).then(function (r) {
+    toast((partEditing ? 'Partie modifiée : ' : 'Partie créée : ') + r.letter + ' — ' + r.name);
+    curPart = r.letter; setPartForm(null); busy(b, false); return loadAnnex();
+  }).catch(function (er) { fail(er, b); });
+});
+$('#partCancel').onclick = function () { setPartForm(null); };
+$('#partDelete').onclick = function () {
+  var b = this;
+  ask('Supprimer la partie ' + partEditing + ' ?', 'Supprimer').then(function (yes) {
+    if (!yes) return;
+    busy(b, true);
+    return run('adminAnnexDeletePart', [partEditing]).then(function () { toast('Partie supprimée'); setPartForm(null); curPart = null; busy(b, false); return loadAnnex(); }).catch(function (e) { fail(e, b); });
+  });
+};
+
+/* --- éditeur de chant --- */
+var previewTimer, previewSeq = 0;
+function openEditor(song) {
+  editing = song || null;
+  $('#songForm').hidden = false;
+  $('#editorTitle').textContent = song ? 'Modifier ' + song.label + ' — ' + song.title : 'Nouveau chant (sera ' + (annex.nextLabels[curPart] || '?') + ')';
+  $('#sTitle').value = song ? song.title : ''; $('#sBody').value = song ? song.body : '';
+  $('#sCols').value = String(song ? song.cols : 1); $('#sNum').value = song ? song.numbering : 'auto';
+  $('#sYt').value = song ? song.youtubeId : ''; $('#sCands').innerHTML = '';
+  $('#sInfo').textContent = song ? 'N° ' + song.label + '' : 'Numéro attribué à l’enregistrement : ' + (annex.nextLabels[curPart] || '—');
+  updatePreview();
+  $('#songForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('#sTitle').focus();
+}
+function closeEditor() { editing = null; $('#songForm').hidden = true; }
+function updatePreview() {
+  clearTimeout(previewTimer);
+  var seq = ++previewSeq;
+  previewTimer = setTimeout(function () {
+    run('adminAnnexPreview', [{ title: $('#sTitle').value, body: $('#sBody').value, cols: $('#sCols').value, numbering: $('#sNum').value }]).then(function (html) {
+      if (seq === previewSeq) $('#preview').innerHTML = html;   // HTML produit et échappé côté serveur
+    }).catch(function () { /* aperçu indisponible : sans conséquence */ });
+  }, 350);
+}
+['sTitle', 'sBody', 'sCols', 'sNum'].forEach(function (id) { $('#' + id).addEventListener('input', updatePreview); $('#' + id).addEventListener('change', updatePreview); });
+$('#newSong').onclick = function () { openEditor(null); };
+$('#sCancel').onclick = closeEditor;
+$('#sSearch').onclick = function () {
+  var t = $('#sTitle').value.trim();
+  if (!t) { toast('Saisissez d’abord le titre.', true); return; }
+  findCandidates(t, $('#sCands'), this, function (id) { $('#sYt').value = id; toast('Vidéo choisie : ' + id); });
+};
+$('#songForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var b = $('#sSave'); busy(b, true);
+  var payload = { page: editing ? editing.page : 0, letter: curPart, title: $('#sTitle').value, body: $('#sBody').value,
+    youtube: $('#sYt').value, cols: $('#sCols').value, numbering: $('#sNum').value };
+  run('adminAnnexSaveSong', [payload]).then(function (r) {
+    toast('Enregistré : ' + r.label + ' — ' + payload.title.trim());
+    busy(b, false); closeEditor(); return loadAnnex();
+  }).catch(function (er) { fail(er, b); });
+});
+document.addEventListener('keydown', function (e) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && !$('#songForm').hidden) { e.preventDefault(); $('#songForm').requestSubmit(); }
+});
+
+/* ======================= LECTEUR ======================= */
+var playerLoaded = false;
+function loadPlayer() {
+  run('adminPlayerGet').then(function (r) {
+    playerLoaded = true;
+    document.querySelectorAll('input[name=psrc]').forEach(function (i) { i.checked = i.value === r.source; });
+    $('#pInst').value = r.piped; $('#iInst').value = r.invidious;
+  }).catch(function (e) { fail(e); });
+}
+$('#pSave').onclick = function () {
+  var b = this, sel = document.querySelector('input[name=psrc]:checked');
+  if (!sel) return toast('Choisissez une source', true);
+  busy(b, true);
+  run('adminPlayerSet', [sel.value, $('#pInst').value, $('#iInst').value]).then(function (r) {
+    busy(b, false); $('#pInst').value = r.piped; $('#iInst').value = r.invidious;
+    toast(r.source === 'youtube' ? 'YouTube officiel activé' : r.source === 'hidden' ? 'YouTube masqué activé' : 'Lecture sans publicité activée (' + r.source + ')');
+  }).catch(function (e) { fail(e, b); });
+};
+$('#pTest').onclick = function () {
+  var b = this; busy(b, true); $('#pMsg').textContent = 'Test en cours…'; $('#pChecks').innerHTML = '';
+  Promise.all([run('adminPlayerTest', ['invidious', $('#iInst').value]), run('adminPlayerTest', ['piped', $('#pInst').value])]).then(function (both) {
+    var res = both[0].concat(both[1]);
+    busy(b, false);
+    var ok = res.filter(function (c) { return c.ok; }).length;
+    $('#pMsg').textContent = ok + ' instance(s) sur ' + res.length + ' répondent.';
+    res.forEach(function (c) {
+      var d = el('div', 'check ' + (c.ok ? 'ok' : 'ko'));
+      d.appendChild(el('span', 'dot', c.ok ? '✓' : '✗'));
+      var t = el('div'); t.appendChild(el('b', null, c.url)); t.appendChild(el('div', 'note', c.detail + ' · ' + c.ms + ' ms'));
+      d.appendChild(t); $('#pChecks').appendChild(d);
+    });
+  }).catch(function (e) { fail(e, b); $('#pMsg').textContent = ''; });
+};
+
+/* ======================= CONTRÔLE ======================= */
+function runCheck(deep, btn) {
+  busy($('#runCheck'), true); busy($('#runDeep'), true);
+  $('#checkMsg').textContent = deep ? 'Contrôle approfondi en cours…' : 'Contrôle en cours…';
+  $('#checks').innerHTML = '';
+  run('adminSelfTest', [!!deep]).then(function (res) {
+    var ko = res.filter(function (c) { return !c.ok; }).length;
+    $('#checkMsg').textContent = ko ? ko + ' contrôle(s) en échec sur ' + res.length : 'Tout est en ordre (' + res.length + ' contrôles).';
+    res.forEach(function (c) {
+      var d = el('div', 'check ' + (c.ok ? 'ok' : 'ko'));
+      d.appendChild(el('span', 'dot', c.ok ? '✓' : '✗'));
+      var t = el('div'); t.appendChild(el('b', null, c.name)); t.appendChild(el('div', 'note', c.detail || ''));
+      d.appendChild(t); $('#checks').appendChild(d);
+    });
+  }).catch(function (e) { $('#checkMsg').textContent = e.message; }).then(function () { busy($('#runCheck'), false); busy($('#runDeep'), false); });
+}
+$('#runCheck').onclick = function () { runCheck(false); };
+$('#runDeep').onclick = function () { runCheck(true); };
+
+var first = (location.hash || '').replace('#', '');
+if (TABS.indexOf(first) !== -1) showTab(first, false);
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<style>
+/* ===== Compléments Apps Script (l'apparence d'origine est conservée) ===== */
+html { -webkit-text-size-adjust: 100%; }
+body { height: 100vh; height: 100dvh; }
+.book-container { height: 100vh; height: 100dvh; overscroll-behavior: contain; }
+@media (prefers-reduced-motion: reduce) { .book-container { scroll-behavior: auto; } * { transition: none !important; } }
+:focus-visible { outline: 2px solid #f4c542; outline-offset: 2px; }
+.page-content-wrapper :focus-visible, .floating-controls :focus-visible { outline-color: var(--accent-color); }
+
+.loading-msg { text-align: center; padding: 60px 20px; color: var(--accent-color); font-size: 18px; }
+
+/* Résultats de recherche : navigation clavier, extraits */
+.search-item.active, .search-item:focus-visible { background: rgba(24, 48, 89, 0.09); outline: none; }
+.search-item-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.search-item-snippet { font-size: 12.5px; color: #5a6475; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-item-snippet mark, .search-item-title mark { background: #f4e3a1; color: inherit; border-radius: 2px; padding: 0 1px; }
+.search-group { padding: 6px 20px 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b7587; background: rgba(0,0,0,.03); font-weight: 700; }
+.search-item-page { white-space: nowrap; padding-left: 12px; }
+
+
+/* Toast */
+.toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 1200;
+    background: var(--accent-color); color: #fff; padding: 10px 16px; border-radius: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 14px; display: flex; gap: 12px; align-items: center;
+    max-width: calc(100vw - 32px);
+}
+.toast.hidden { display: none; }
+.toast button { background: #fff; color: var(--accent-color); border: none; border-radius: 14px; padding: 4px 10px; font-weight: 700; cursor: pointer; }
+
+/* Lecteur YouTube officiel, visible (exigence des conditions d'utilisation de l'API) */
+.floating-audio-summary { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.yt-video {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden;
+    background: #0f172a; box-shadow: 0 3px 8px rgba(0,0,0,.18);
+}
+.yt-video iframe, .yt-video > div { position: absolute; inset: 0; width: 100% !important; height: 100% !important; border: 0; }
+.yt-video-msg {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px; text-align: center; color: #e2e8f0; font-size: 13px; background: rgba(15,23,42,.92); z-index: 2;
+}
+.yt-video-msg a { color: #fff; background: #ff0033; border-radius: 14px; padding: 5px 12px; font-weight: 700; text-decoration: none; }
+.youtube-control-btn.on { background: #f4c542; color: #0f172a; border-color: #f4c542; }
+.youtube-icon-btn { font-size: 13px; }
+.youtube-control-btn:disabled { cursor: not-allowed; }
+.floating-close {
+    margin-left: auto; border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--accent-color);
+    line-height: 1; padding: 2px 6px; border-radius: 6px;
+}
+
+/* Vidéo fermée par défaut : le lecteur reste dans la page (hors écran) pour que le son continue. */
+.yt-video.collapsed { position: absolute; left: -9999px; top: 0; width: 240px; height: 135px; opacity: 0; pointer-events: none; }
+
+/* Pas de content-visibility : des hauteurs de pages estimées faussaient le défilement vers une page lointaine */
+.book-container.no-snap { scroll-snap-type: none; }
+.page.arrive { animation: pageArrive 1.4s ease-out; }
+@keyframes pageArrive { 0%, 40% { box-shadow: 0 0 0 4px #f4c542, 0 15px 35px rgba(0,0,0,.12); } 100% { box-shadow: 0 15px 35px rgba(0,0,0,.12), 0 5px 15px rgba(0,0,0,.06); } }
+
+/* Mobile : panneau pleine largeur en bas */
+@media (max-width: 600px) {
+    .floating-controls { right: 8px; left: 8px; bottom: 8px; width: auto; padding: 10px 12px; max-height: 70dvh; overflow-y: auto; }
+    .toast { bottom: 90px; }
+    .page { padding: 28px 22px 52px 22px; }
+}
+@media print {
+    #global-header, .floating-controls, .toast, .inline-song-audio-btn, .inline-song-fav-btn { display: none !important; }
+    body, .book-container { height: auto; overflow: visible; padding-top: 0 !important; }
+    .page { box-shadow: none; break-after: page; margin: 0 auto; }
+}
+
+/* ===== Pages : mise en page qui s'adapte à l'écran (ordre et colonnes du PDF imprimé) ===== */
+.page-content-wrapper { font-size: 16px; line-height: 1.5; justify-content: flex-start; }
+.song { width: 100%; }
+.song + .song { margin-top: 18px; padding-top: 6px; border-top: 1px dashed rgba(24, 48, 89, .25); }
+.song-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; margin: 4px 0 10px; }
+.song-head .song-title { margin: 0; cursor: default; font-size: clamp(24px, 4vw, 34px); line-height: 1.12; text-align: center; }
+.song-head .song-title:hover { opacity: 1; }
+.song-head .song-actions { margin: 0; }
+.cols { column-count: var(--n, 2); column-gap: 34px; margin-top: 6px; }
+.cols.c2 { --n: 2; } .cols.c3 { --n: 3; } .cols.c4 { --n: 4; column-gap: 22px; }
+.cols .verse, .cols .refrain { break-inside: avoid; }
+.cols.c3 .verse, .cols.c4 .verse { font-size: 15px; }
+.song-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 38px; align-items: start; }
+.song-pair .song + .song { margin-top: 0; padding-top: 0; border-top: 0; }
+.verse { margin-bottom: 14px; padding-left: 28px; }
+.verse.nonum { padding-left: 0; }
+.verse-number { width: 24px; }
+.refrain { margin: 6px 0 16px; padding: 2px 0 2px 16px; }
+.refrain-label { margin-bottom: 2px; }
+.page.pdf { padding: 0; min-height: 0; }
+.page.pdf .page-content-wrapper { padding: 0; display: block; flex: none; width: 100%; }
+
+/* Boutons-icônes : écouter, favori, retour au sommaire */
+.song-actions { display: inline-flex; gap: 4px; align-items: center; }
+.song-actions.inline { margin-left: 10px; vertical-align: middle; }
+.ic-btn {
+    width: 30px; height: 30px; flex: 0 0 auto; padding: 0; border-radius: 50%;
+    border: 1px solid rgba(24, 48, 89, .35); background: rgba(255, 255, 255, .7); color: var(--accent-color);
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    font: 700 16px/1 var(--font-text); text-decoration: none; transition: background .15s, color .15s, transform .1s;
+}
+.ic-btn svg { width: 16px; height: 16px; fill: currentColor; display: block; }
+.ic-btn:hover { background: var(--accent-color); color: #fff; }
+.ic-btn:active { transform: scale(.94); }
+.ic-btn:disabled { opacity: .4; cursor: default; background: transparent; color: var(--accent-color); }
+.ic-btn.song-play-btn { background: var(--accent-color); color: #fff; }
+.ic-btn.song-play-btn.search { background: rgba(255,255,255,.7); color: #c4001f; border-color: rgba(196,0,31,.45); }
+.ic-btn.song-fav-btn.on { color: #c8941a; border-color: #c8941a; }
+.ic-btn.on { background: #f4c542; color: #0f172a; border-color: #f4c542; }
+.sommaire-item.flash { animation: sommaireFlash 2.4s ease-out; }
+@keyframes sommaireFlash { 0%, 55% { background: #f4e3a1; box-shadow: 0 0 0 6px #f4e3a1; } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
+
+/* Pages-images (séparateurs de section, illustrations) */
+.pdfimg { width: 100%; aspect-ratio: 1.4189; background: var(--page-bg); display: flex; align-items: center; justify-content: center; color: #8a8f99; }
+.pdfimg img { width: 100%; height: 100%; object-fit: contain; display: block; mix-blend-mode: multiply; }
+.page.img-page .page-number { display: none; }
+
+/* Petits écrans : une seule colonne, texte plus grand, marges réduites */
+@media (max-width: 900px) {
+    .page { padding: 18px 16px 48px; width: 100%; max-width: 100%; margin: 14px 0; border-radius: 0; }
+    .page.pdf { padding: 0; }
+    .page-content-wrapper { font-size: 17px; line-height: 1.5; }
+    .cols, .cols.c2, .cols.c3, .cols.c4 { column-count: 1; }
+    .song-pair { display: block; }
+    .song-pair .song + .song { margin-top: 18px; padding-top: 6px; border-top: 1px dashed rgba(24, 48, 89, .25); }
+    .verse, .cols.c3 .verse, .cols.c4 .verse { font-size: 17px; line-height: 1.5; margin-bottom: 14px; padding-left: 28px; }
+    .verse.nonum { padding-left: 0; }
+    .refrain { font-size: 17px; line-height: 1.5; margin: 6px 0 16px; padding-left: 14px; }
+    .song-head .song-title { font-size: 26px; }
+    .page-number { bottom: 14px; }
+}
+}
+
+/* Lecteur : en-tête compact (titre + icônes), transport et réglages sur la même carte */
+.ap-head { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ap-title { flex: 1; min-width: 0; color: var(--accent-color); font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap-head .ic-btn { width: 28px; height: 28px; }
+.ap-head .ic-btn svg { width: 15px; height: 15px; }
+.ap-yt { color: #d7002b; border-color: rgba(215, 0, 43, .4); }
+.ap-yt:hover { background: #d7002b; color: #fff; }
+.ap-close { border-color: transparent; background: transparent; }
+.youtube-control-strip { gap: 6px; padding: 8px; }
+.youtube-control-strip .tp { width: 34px; height: 34px; border-color: rgba(255, 255, 255, .32); background: rgba(255, 255, 255, .1); color: #f8fafc; border-radius: 8px; }
+.youtube-control-strip .tp:hover { background: rgba(255, 255, 255, .22); }
+.youtube-control-strip .tp.primary { background: #f8fafc; color: #0f172a; border-color: #f8fafc; }
+.youtube-control-strip .tp svg { width: 18px; height: 18px; }
+.youtube-control-strip .tp:disabled { opacity: .35; }
+.ap-sub { flex: 1 0 100%; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ap-sub .youtube-control-status { flex: 1 1 auto; text-align: right; }
+
+/* Chant en cours de lecture sur la page affichée : seul le lecteur reste */
+.floating-controls.now-here .controls-current-song, .floating-controls.now-here .controls-buttons { display: none; }
+.floating-controls.now-here .floating-audio-panel { border-top: 0; padding-top: 0; }
+
+/* Barre d'onglets lue dans le projet « barre » */
+.nav-note { display: inline-flex; align-items: center; gap: 6px; color: rgba(255, 255, 255, .78); font-size: 12px; white-space: nowrap; margin: 0 .5rem; }
+.nav-note .icon { background: transparent; }
+button.tab.nav-logout { cursor: pointer; font: inherit; color: inherit; }
+.ic-btn[hidden] { display: none !important; }
+.ap-video { width: auto !important; border-radius: 15px !important; padding: 0 10px !important; gap: 5px; }
+.ap-vlabel { font: 700 12px/1 var(--font-text); }
+.text-page .verse { margin-bottom: .5em; padding-left: 0; }
+.text-page .song-head { margin-bottom: 14px; }
+
+/* Annexes (hors PDF) */
+.sommaire-heading { margin-top: .9em; font-weight: 700; border-top: 1px solid rgba(24, 48, 89, .3); padding-top: .5em; }
+.sommaire-heading a { color: var(--accent-color); }
+.annex-title { font-family: var(--font-title); font-size: clamp(22px, 3.6vw, 30px); color: var(--accent-color); text-align: center; margin: 4px 0 10px; }
+.annex-intro { text-align: center; font-style: italic; margin: 0 0 14px; }
+.annex-sub { font-weight: 700; color: var(--accent-color); margin: 14px 0 6px; border-bottom: 1px solid rgba(24, 48, 89, .25); }
+.annex-list { margin: 0; padding-left: 0; list-style: none; columns: 2; column-gap: 28px; }
+.annex-list li { break-inside: avoid; padding: 3px 0; }
+.annex-list a { color: inherit; text-decoration: none; }
+.annex-list a:hover { text-decoration: underline; }
+.annex-list b, .annex-ref { color: var(--accent-color); font-weight: 700; }
+.annex-note { margin-top: 16px; font-size: 12.5px; color: #5a6475; text-align: center; }
+@media (max-width: 900px) { .annex-list { columns: 1; } }
+</style>
